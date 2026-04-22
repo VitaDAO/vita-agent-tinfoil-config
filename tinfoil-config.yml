@@ -11,14 +11,14 @@
 #   5. Tinfoil dashboard detects the new tag and deploys automatically
 
 cvm-version: 0.7.5
-cpus: 4
-memory: 16384  # 16 GB — fastembed (bge-base) + reranker + Python interpreter
+cpus: 8         # Phase 1+3: 4 uvicorn workers, each forking subprocesses per request
+memory: 32768   # 32 GB — workers + per-request child processes + sandbox memory headroom
 
 containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:v0.1.9@sha256:bb4bd1ce8b6ba7c8441422f89df1c9a473924278f611843bab69338dba6640b5"
+    image: "ghcr.io/vitadao/vita-agent:v0.8.0@sha256:13b02d121125ca7dbeb9c77f0b284084bf2f29e3aba488843440a8334eb59bba"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
