@@ -21,7 +21,9 @@ containers:
     image: "ghcr.io/vitadao/vita-agent:v0.1.0@sha256:2702c36dfabd0399c7839a7dc577e87ae1fdd20652dd48328737d773a4ae13d3"
     registry:
       username: DobrinAlexandru
-      password_secret: GHCR_TOKEN
+      # Per-service secret name so vita-agent and aubrai-server can rotate
+      # independently even if Tinfoil shares the secret namespace across containers.
+      password_secret: VITA_AGENT_GHCR_TOKEN
 
     env:
       # ── Non-sensitive runtime config (safe to commit) ──
@@ -61,8 +63,9 @@ containers:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
       # Set each in the Tinfoil Dashboard > Secrets BEFORE first deploy.
 
-      # GHCR pull credentials
-      - GHCR_TOKEN
+      # GHCR pull credentials — per-service name so vita-agent and aubrai-server
+      # can rotate independently even if Tinfoil shares the secret namespace.
+      - VITA_AGENT_GHCR_TOKEN
 
       # Tinfoil Inference (LLM) auth
       - TINFOIL_API_KEY
