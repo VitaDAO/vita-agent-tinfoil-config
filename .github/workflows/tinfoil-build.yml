@@ -21,4 +21,8 @@ jobs:
         with:
           config-file: ${{ github.workspace }}/tinfoil-config.yml
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          prerelease: "true"
+          # MUST be "false" — atc.tinfoil.sh fetches the deployment manifest via
+          # GitHub's /releases/latest endpoint, which skips prereleases. A
+          # prerelease-only repo causes atc to return HTTP 500 "Failed to build
+          # attestation bundle" and the browser SecureClient init throws.
+          prerelease: "false"
