@@ -17,8 +17,8 @@ memory: 16384  # 16 GB — fastembed (bge-base) + reranker + Python interpreter
 containers:
   - name: vita-agent
     # Image digest is pinned per release.
-    # First-deploy placeholder — replace before pushing the v0.1.0 tag.
-    image: "ghcr.io/vitadao/vita-agent:v0.1.0@sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    # Update by hand whenever a new vita-agent build lands in GHCR.
+    image: "ghcr.io/vitadao/vita-agent:v0.1.0@sha256:2702c36dfabd0399c7839a7dc577e87ae1fdd20652dd48328737d773a4ae13d3"
     registry:
       username: DobrinAlexandru
       password_secret: GHCR_TOKEN
