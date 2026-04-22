@@ -58,9 +58,16 @@ containers:
       # LLM provider — Tinfoil Inference is the only allowed provider.
       # Available models (2026-04-22): glm-5-1, gpt-oss-120b, kimi-k2-6,
       # llama3-3-70b, gemma4-31b, qwen3-vl-30b, voxtral-small-24b.
-      # Aubrai uses glm-5-1 — match for consistency.
+      #
+      # 2026-04-22: switched glm-5-1 → kimi-k2-6. Local bench (3 trials,
+      # non-streaming, identical prompts) showed kimi-k2-6 is 2-4.5x
+      # faster end-to-end than glm-5-1 with much steadier latency:
+      #   short  prompt:  glm 3.80s  kimi 0.90s  (4.23x)
+      #   medium prompt:  glm 13.96s kimi 7.14s  (1.96x)
+      #   long   prompt:  glm 22.02s kimi 4.81s  (4.58x)
+      # Tok/s: glm 8-34 (high variance), kimi 42-96 (steady).
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      - VITA_AGENT_MODEL: "glm-5-1"
+      - VITA_AGENT_MODEL: "kimi-k2-6"
 
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
