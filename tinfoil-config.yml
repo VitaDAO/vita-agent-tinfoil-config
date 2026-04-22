@@ -55,9 +55,12 @@ containers:
       # Aubrai routing
       - AUBRAI_MODE: "x402"
 
-      # LLM provider — Tinfoil Inference is the only allowed provider
+      # LLM provider — Tinfoil Inference is the only allowed provider.
+      # Available models (2026-04-22): glm-5-1, gpt-oss-120b, kimi-k2-6,
+      # llama3-3-70b, gemma4-31b, qwen3-vl-30b, voxtral-small-24b.
+      # Aubrai uses glm-5-1 — match for consistency.
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      - VITA_AGENT_MODEL: "claude-opus-4-7"
+      - VITA_AGENT_MODEL: "glm-5-1"
 
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
