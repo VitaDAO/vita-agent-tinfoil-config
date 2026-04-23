@@ -90,8 +90,13 @@ containers:
       # for the regression: hallucinated "Aubrai found..." attributions
       # and skipped tool calls on ambiguous biology terms. If those
       # come back, rollback to gemma4-31b is one line.
+      #
+      # 2026-04-23 (v0.8.15): kimi-k2-6 → kimi-k2-5. v0.8.14 pinned the
+      # wrong K2 SKU; user explicitly asked for k2-5. Tinfoil exposes
+      # both — `curl -H "Authorization: Bearer $TINFOIL_API_KEY"
+      # https://inference.tinfoil.sh/v1/models` lists both ids.
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      - VITA_AGENT_MODEL: "kimi-k2-6"
+      - VITA_AGENT_MODEL: "kimi-k2-5"
 
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
