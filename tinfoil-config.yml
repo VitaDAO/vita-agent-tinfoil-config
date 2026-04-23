@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:v0.8.16@sha256:517dd8cdc0da9cb5b44bdfdbf3626e631c83502eb80eabdf406795f6747da872"
+    image: "ghcr.io/vitadao/vita-agent:v0.8.17@sha256:82ae96ece4af3b4a38d17563f8cf52e8ff92cbb11925aacc1f3f518bb8b738a9"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -32,8 +32,10 @@ containers:
 
       # Production-mode hardening
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"      # Reject plaintext DEK headers
-      - VITA_AGENT_ATTESTATION_MODE: "production"
       - VITA_AGENT_JSON_LOGS: "1"
+      # Note: no VITA_AGENT_ATTESTATION_MODE — attestation is served by
+      # the cvmimage shim at /.well-known/tinfoil-attestation, not by
+      # this workload. Removed in vita-agent v0.8.17.
 
       # Per-user rate limiting (token bucket)
       - VITA_AGENT_RATE_LIMIT_RPM: "60"
@@ -126,7 +128,9 @@ shim:
     - /api/health
     - /metrics
     - /.well-known/enclave-pubkey
-    - /.well-known/attestation
+    # Note: /.well-known/tinfoil-attestation is served by the shim
+    # itself (cvmimage), so we don't list it here. The vita-agent
+    # workload doesn't publish an attestation route as of v0.8.17.
 
     # Authenticated AI endpoints
     - /api/agent
