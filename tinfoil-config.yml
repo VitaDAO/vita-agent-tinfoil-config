@@ -84,8 +84,14 @@ containers:
       # follows the system-prompt routing rules naturally. Slightly
       # slower per token (5-30s for tool-using turns vs kimi's 5-22s)
       # but the reliability + honesty gain outweighs the latency.
+      #
+      # 2026-04-23 (v0.8.14): reverted gemma4-31b → kimi-k2-6. Trading
+      # routing reliability for raw speed during the perf push. Watch
+      # for the regression: hallucinated "Aubrai found..." attributions
+      # and skipped tool calls on ambiguous biology terms. If those
+      # come back, rollback to gemma4-31b is one line.
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      - VITA_AGENT_MODEL: "gemma4-31b"
+      - VITA_AGENT_MODEL: "kimi-k2-6"
 
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
