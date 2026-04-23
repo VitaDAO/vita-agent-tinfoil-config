@@ -59,15 +59,21 @@ containers:
       # Available models (2026-04-22): glm-5-1, gpt-oss-120b, kimi-k2-6,
       # llama3-3-70b, gemma4-31b, qwen3-vl-30b, voxtral-small-24b.
       #
-      # 2026-04-22: switched glm-5-1 → kimi-k2-6. Local bench (3 trials,
-      # non-streaming, identical prompts) showed kimi-k2-6 is 2-4.5x
-      # faster end-to-end than glm-5-1 with much steadier latency:
-      #   short  prompt:  glm 3.80s  kimi 0.90s  (4.23x)
-      #   medium prompt:  glm 13.96s kimi 7.14s  (1.96x)
-      #   long   prompt:  glm 22.02s kimi 4.81s  (4.58x)
-      # Tok/s: glm 8-34 (high variance), kimi 42-96 (steady).
+      # 2026-04-22: switched glm-5-1 → kimi-k2-6. Local bench showed
+      # kimi was 2-4.5x faster than glm-5-1 with much steadier latency.
+      #
+      # 2026-04-22 (v0.8.8): switched kimi-k2-6 → gemma4-31b. The
+      # routing test (scripts/test_aubrai_routing.py, 17 prompts mixing
+      # trivial / user-data / explicit-ask / longevity-domain / ambiguous
+      # biology) showed kimi-k2-6 unreliably called call_aubrai_scientist
+      # for ambiguous biology terms (FOXO3, alpha-ketoglutarate) and even
+      # fabricated "Aubrai found..." attributions when it skipped the
+      # call. gemma4-31b scored 17/17 with no forced classifier — it
+      # follows the system-prompt routing rules naturally. Slightly
+      # slower per token (5-30s for tool-using turns vs kimi's 5-22s)
+      # but the reliability + honesty gain outweighs the latency.
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      - VITA_AGENT_MODEL: "kimi-k2-6"
+      - VITA_AGENT_MODEL: "gemma4-31b"
 
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
