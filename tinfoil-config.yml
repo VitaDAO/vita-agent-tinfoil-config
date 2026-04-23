@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:v0.8.11@sha256:72a17f6f47fb5ca3d2546e31d36193c2e06ceebf6dfa55f316c94ec45708ef63"
+    image: "ghcr.io/vitadao/vita-agent:v0.8.12@sha256:18ad70ea1918321db86597e85321181e623d9d2c435f49184653cea0b145550b"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -54,6 +54,18 @@ containers:
 
       # Aubrai routing
       - AUBRAI_MODE: "x402"
+
+      # v0.8.12: debug-mode flags (currently ON for dev iteration)
+      # AUBRAI_DEBUG=1 → use plaintext /api/chat instead of /api/chat/encrypted.
+      #   No HPKE seal/decrypt. Aubrai backend still receives HPKE
+      #   responses via their own enclave; we just don't HPKE the body.
+      #   x402 still applies (both endpoints are paywalled).
+      # AUBRAI_FAST=1 → set body {"fast": true} on /api/chat. Aubrai's
+      #   schema: fast=true returns ~3-6s conversational; fast=false
+      #   does ~15-25s deep research with citations.
+      # Set both to "0" or remove for production HPKE+deep mode.
+      - AUBRAI_DEBUG: "1"
+      - AUBRAI_FAST: "1"
 
       # LLM provider — Tinfoil Inference is the only allowed provider.
       # Available models (2026-04-22): glm-5-1, gpt-oss-120b, kimi-k2-6,
