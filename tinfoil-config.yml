@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:v0.8.17@sha256:82ae96ece4af3b4a38d17563f8cf52e8ff92cbb11925aacc1f3f518bb8b738a9"
+    image: "ghcr.io/vitadao/vita-agent:v0.9.0@sha256:ed7261a7712cd07b76df9842cada7f5f404a3673bf98374fd5b770b8c998da47"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -136,6 +136,16 @@ shim:
     - /api/agent
     - /api/intent/*
     - /api/feedback
+
+    # v0.9.0 — capsule transport (sealed envelope path).
+    # Browser opt-in via localStorage `vita.useCapsule=1`; otherwise
+    # legacy /api/intent/* path remains the default during the
+    # dual-accept window (until C.2 cutover removes it).
+    - /api/v1/capsule
+
+    # v0.9.0 — admin endpoint for embedding compaction (returns 503 stub
+    # until admin DB credentials are wired at C.2).
+    - /admin/compact-embedding
 
     # Sessions sidebar
     - /api/sessions
