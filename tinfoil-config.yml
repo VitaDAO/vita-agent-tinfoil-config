@@ -26,11 +26,26 @@ containers:
       password_secret: VITA_AGENT_GHCR_TOKEN
 
     env:
+      # ⚠️ DEBUG MANIFEST — reviewer batch #3 (Task #218) clarification.
+      # This file is intentionally pre-cutover per user policy
+      # (memory: "stay on debug, don't trigger C.2 cutover"). The
+      # C.2 hardening envs (STRICT_PROD, OPENAI_AGENTS_DISABLE_TRACING,
+      # SUPABASE_JWT_SECRET, VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS=0,
+      # AAD_REQUIRED, V3_ASSEMBLER, EMBEDDINGS_V3) are NOT set here
+      # by design. AUBRAI_DEBUG=1 is also intentional — Aubrai
+      # traffic uses plaintext /api/chat for dev iteration.
+      #
+      # Production manifest sample with all C.2 envs lives at
+      # vita-agent/docs/C2_CUTOVER_PLAYBOOK.md §"Step 4 — Cutover
+      # env flips". Copy that block into this file's env: list,
+      # bump the image to a v0.9.x with all sweeps complete, and
+      # tag a non-debug release when you're actually flipping C.2.
+
       # ── Non-sensitive runtime config (safe to commit) ──
       - VITA_AGENT_PORT: "8787"
       - STORAGE_BACKEND: "supabase"
 
-      # Production-mode hardening
+      # Production-mode hardening (partial — debug deploy)
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"      # Reject plaintext DEK headers
       - VITA_AGENT_JSON_LOGS: "1"
       # Note: no VITA_AGENT_ATTESTATION_MODE — attestation is served by
