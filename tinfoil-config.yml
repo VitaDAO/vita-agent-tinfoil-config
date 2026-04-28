@@ -97,8 +97,16 @@ containers:
       # wrong K2 SKU; user explicitly asked for k2-5. Tinfoil exposes
       # both — `curl -H "Authorization: Bearer $TINFOIL_API_KEY"
       # https://inference.tinfoil.sh/v1/models` lists both ids.
+      #
+      # 2026-04-28: kimi-k2-5 → kimi-k2-6. Tinfoil rotated the k2-5 SKU
+      # (no longer in /v1/models); requests return 503 "engine overloaded"
+      # which surfaces to the browser as InternalServerError on chat.
+      # Verified via scripts/test_tinfoil_models.sh — k2-6 returns 200
+      # in 3ms; k2-5 absent from the model list. Other available kimi-class
+      # alternatives if k2-6 ever rotates: gemma4-31b, llama3-3-70b,
+      # gpt-oss-120b (all returned 200 in the same probe).
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      - VITA_AGENT_MODEL: "kimi-k2-5"
+      - VITA_AGENT_MODEL: "kimi-k2-6"
 
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
