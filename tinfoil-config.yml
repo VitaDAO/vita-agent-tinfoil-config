@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:v0.9.11@sha256:0988bacfdcf9bf0bc53b7f72d194b7943b48c8a6dc6264ca0c2b7aed8e151ecc"
+    image: "ghcr.io/vitadao/vita-agent:v0.9.12@sha256:25d0dcdf2ddcd299628a3a36b4343375010b10d1e0acc1444256074586f6591e"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -48,6 +48,7 @@ containers:
       # Production-mode hardening (partial — debug deploy)
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"      # Reject plaintext DEK headers
       - VITA_AGENT_JSON_LOGS: "1"
+      - VITA_AGENT_DEBUG_JOB_ERROR_CLASS: "1"  # debug-only: safe exception class code for job E2E triage
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
       - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
       # Note: no VITA_AGENT_ATTESTATION_MODE — attestation is served by
