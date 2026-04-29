@@ -138,6 +138,7 @@ containers:
       # boot.py rejects it on startup. Per-request RLS is the entire access model.
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
+      - SUPABASE_JWT_SECRET           # Signs short-lived vita_agent_internal JWTs for jobs/replay/audit.
 
       # Aubrai scientist tool — HPKE seal target + x402 wallet
       - AUBRAI_HPKE_PUBLIC_KEY        # 32-byte hex; published by Aubrai
@@ -165,10 +166,15 @@ shim:
     # legacy /api/intent/* path remains the default during the
     # dual-accept window (until C.2 cutover removes it).
     - /api/v1/capsule
+    - /api/v1/jobs
+    - /api/v1/jobs/*
 
     # v0.9.0 — admin endpoint for embedding compaction (returns 503 stub
     # until admin DB credentials are wired at C.2).
     - /admin/compact-embedding
+    # Debug deploy only: manually drains one long-task job inside a forked
+    # child using the same HPKE identity as the interactive server.
+    - /admin/jobs/run-one
 
     # Sessions sidebar
     - /api/sessions
