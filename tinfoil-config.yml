@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:v0.9.8@sha256:518015f5faca2b48ec9ad126b6720e32d8b57a727a5629bd56fcfd421c7f2794"
+    image: "ghcr.io/vitadao/vita-agent:v0.9.9@sha256:14103de765b17ac74b58fc9cf3b981769908674889f2bd170135550633f2ba03"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -138,6 +138,9 @@ containers:
 
       # Supabase — anon key only. SUPABASE_SERVICE_ROLE_KEY MUST NOT be added;
       # boot.py rejects it on startup. Per-request RLS is the entire access model.
+      # Debug /admin/jobs/run-one uses a Supabase-issued admin/machine-user
+      # bearer token. Do not add JWT signing keys or the legacy shared
+      # SUPABASE_JWT_SECRET to this debug enclave.
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
 
