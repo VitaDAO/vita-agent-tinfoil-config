@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:v0.9.6@sha256:5c8377b01cc767c00cefa3df2c944bfef8e7f2828d6c513560e01c17eba7122a"
+    image: "ghcr.io/vitadao/vita-agent:v0.9.7@sha256:d984b1cf9423eb22960cda362eff7917c3f91800c77c0810d601cefcd7593900"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -30,7 +30,7 @@ containers:
       # This file is intentionally pre-cutover per user policy
       # (memory: "stay on debug, don't trigger C.2 cutover"). The
       # C.2 hardening envs (STRICT_PROD, OPENAI_AGENTS_DISABLE_TRACING,
-      # SUPABASE_JWT_SECRET, VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS=0,
+      # VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS=0,
       # AAD_REQUIRED, V3_ASSEMBLER, EMBEDDINGS_V3) are NOT set here
       # by design. AUBRAI_DEBUG=1 is also intentional — Aubrai
       # traffic uses plaintext /api/chat for dev iteration.
@@ -48,6 +48,8 @@ containers:
       # Production-mode hardening (partial — debug deploy)
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"      # Reject plaintext DEK headers
       - VITA_AGENT_JSON_LOGS: "1"
+      - SUPABASE_JWT_VERIFY_MODE: "jwks"
+      - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
       # Note: no VITA_AGENT_ATTESTATION_MODE — attestation is served by
       # the cvmimage shim at /.well-known/tinfoil-attestation, not by
       # this workload. Removed in vita-agent v0.8.17.
@@ -138,7 +140,6 @@ containers:
       # boot.py rejects it on startup. Per-request RLS is the entire access model.
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
-      - SUPABASE_JWT_SECRET           # Signs short-lived vita_agent_internal JWTs for jobs/replay/audit.
 
       # Aubrai scientist tool — HPKE seal target + x402 wallet
       - AUBRAI_HPKE_PUBLIC_KEY        # 32-byte hex; published by Aubrai
