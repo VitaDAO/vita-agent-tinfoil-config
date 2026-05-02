@@ -60,7 +60,7 @@ containers:
       - VITA_AGENT_MAX_REQUEST_BYTES: "2097152"  # 2MB
 
       # Browser allowlist — origins that can hit /api/*
-      - VITA_AGENT_CORS_ORIGINS: "https://app.vitadao.com,https://vitadao-longevity-app.lovable.app"
+      - VITA_AGENT_CORS_ORIGINS: "https://app.vitadao.com,https://staging-app.vitadao.com,https://vitadao-longevity-app.lovable.app,http://localhost:8000,http://127.0.0.1:8000"
 
       # Memory pipeline (bge-base default; downgrade to bge-small only if streaming
       # latency is a problem. Adaptive chunk size + adaptive K are always on.)
