@@ -85,7 +85,7 @@ containers:
       #   does ~15-25s deep research with citations.
       # Set both to "0" or remove for production HPKE+deep mode.
       - AUBRAI_DEBUG: "1"
-      - AUBRAI_FAST: "1"
+      - AUBRAI_FAST: "0"
 
       # LLM provider — Tinfoil Inference is the only allowed provider.
       # Available models (2026-04-22): glm-5-1, gpt-oss-120b, kimi-k2-6,
@@ -124,7 +124,7 @@ containers:
       # alternatives if k2-6 ever rotates: gemma4-31b, llama3-3-70b,
       # gpt-oss-120b (all returned 200 in the same probe).
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      - VITA_AGENT_MODEL: "kimi-k2-6"
+      - VITA_AGENT_MODEL: "gemma4-31b"
 
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
