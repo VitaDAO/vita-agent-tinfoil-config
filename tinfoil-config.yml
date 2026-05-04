@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:6b612f2439f928631e2b1efab72668c876d75d05@sha256:eb7d2f6b48c28edc5105949117bc91c17d15c513a7135482e86db8fa749f8408"
+    image: "ghcr.io/vitadao/vita-agent:cd49fed6f6274bb1ab0b1a5e234551059871f58f@sha256:13f5d125f0d65841afd608f7c98d35363a4f5c8e9c5452bc02b99892a1d3a567"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -146,13 +146,15 @@ containers:
 
       # Supabase — anon key + asymmetric internal JWT signer. The internal
       # signer mints short-lived vita_agent_internal=true tokens for replay,
-      # audit, cost, and job-worker control-plane writes. Do NOT add
+      # audit, cost, and job-worker control-plane writes. This org already
+      # stores the signing key as VITA_AGENT_INTERNAL_JWT_PRIVATE_JWK, which
+      # vita-agent accepts as an alias for the canonical
+      # SUPABASE_INTERNAL_JWT_PRIVATE_JWK env. Do NOT add
       # SUPABASE_SERVICE_ROLE_KEY; boot.py rejects it on startup. Do NOT add
       # the legacy shared SUPABASE_JWT_SECRET.
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
-      - SUPABASE_INTERNAL_JWT_PRIVATE_KEY
-      - SUPABASE_INTERNAL_JWT_KID
+      - VITA_AGENT_INTERNAL_JWT_PRIVATE_JWK
 
       # Aubrai scientist tool — HPKE seal target + x402 wallet
       - AUBRAI_HPKE_PUBLIC_KEY        # 32-byte hex; published by Aubrai
