@@ -85,9 +85,14 @@ and the Tinfoil dashboard auto-deploys.
 | `SUPABASE_ANON_KEY` | per-request RLS client | RLS-scoped, anonymous role |
 | `AUBRAI_HPKE_PUBLIC_KEY` | aubrai_scientist tool | 32-byte hex pubkey |
 | `X402_WALLET_PRIVATE_KEY` | aubrai_scientist tool | Funded Base mainnet wallet |
+| `SENTRY_DSN` | PHI-safe error monitoring | Optional; enables scrubbed Sentry events |
 
 `X402_WALLET_PRIVATE_KEY` is the highest-value secret — never log, never
 store outside the dashboard's encrypted slot.
+
+Sentry is optional and disabled when `SENTRY_DSN` is unset. The runtime scrubber
+removes request bodies, headers, cookies, user identifiers, DEKs, prompts,
+health/lab/research payloads, and stack locals before sending events.
 
 `SUPABASE_SERVICE_ROLE_KEY` MUST NOT be added. `boot.py::_validate_storage_config`
 rejects any non-empty value at startup.

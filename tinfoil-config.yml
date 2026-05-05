@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:9991286f64ee30a099ed3372c209da120862bf54@sha256:b827dd66bfc64acc58db6b443f72c318a208d53d542cb85709163bf2b8b4a4d9"
+    image: "ghcr.io/vitadao/vita-agent:123421589f0ab31af076fe368a705d8d9519b8e9@sha256:acb4d7ba94770318f77cb3ce4263416e97d866eeb97c1ba51dbf9b27aaba2513"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -49,6 +49,12 @@ containers:
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"      # Reject plaintext DEK headers
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_DEBUG_JOB_ERROR_CLASS: "1"  # debug-only: safe exception class code for job E2E triage
+      # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
+      # Tinfoil secret. Keep traces off by default; raise only for short
+      # debug windows after verifying scrubber behavior.
+      - SENTRY_ENVIRONMENT: "debug"
+      - SENTRY_TRACES_SAMPLE_RATE: "0"
+      - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
       - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
       # Note: no VITA_AGENT_ATTESTATION_MODE — attestation is served by
@@ -148,6 +154,9 @@ containers:
 
       # Tinfoil Inference (LLM) auth
       - TINFOIL_API_KEY
+
+      # Sentry error monitoring. DSN is a secret in Tinfoil, never committed.
+      - SENTRY_DSN
 
       # Supabase — anon key + debug-only service role fallback. Production must
       # replace SUPABASE_SERVICE_ROLE_KEY with an asymmetric internal JWT signer
