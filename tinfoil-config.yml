@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:cd49fed6f6274bb1ab0b1a5e234551059871f58f@sha256:13f5d125f0d65841afd608f7c98d35363a4f5c8e9c5452bc02b99892a1d3a567"
+    image: "ghcr.io/vitadao/vita-agent:787baf74f3b29f64c9eb81bcc35bd0baeb076c71@sha256:f67b8ba83fee47a375f060b88e7359869b0b9d55e3784afb855b4d54cceeaa5c"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -78,6 +78,11 @@ containers:
       # signer secrets below; if those are unset, it logs and idles safely.
       - VITA_AGENT_JOB_AUTORUN: "1"
       - VITA_AGENT_JOB_AUTORUN_POLL_SECONDS: "2"
+      # DEBUG/STAGING ONLY: temporary control-plane writer fallback while the
+      # Supabase asymmetric internal JWT private key is being provisioned. The
+      # workload accepts SUPABASE_SERVICE_ROLE_KEY only when this flag is set;
+      # STRICT_PROD rejects this flag. Remove both before production cutover.
+      - VITA_AGENT_DEBUG_ALLOW_SERVICE_ROLE_INTERNAL_CLIENT: "1"
 
       # Aubrai routing
       - AUBRAI_MODE: "x402"
@@ -144,17 +149,14 @@ containers:
       # Tinfoil Inference (LLM) auth
       - TINFOIL_API_KEY
 
-      # Supabase — anon key + asymmetric internal JWT signer. The internal
-      # signer mints short-lived vita_agent_internal=true tokens for replay,
-      # audit, cost, and job-worker control-plane writes. This org already
-      # stores the signing key as VITA_AGENT_INTERNAL_JWT_PRIVATE_JWK, which
-      # vita-agent accepts as an alias for the canonical
-      # SUPABASE_INTERNAL_JWT_PRIVATE_JWK env. Do NOT add
-      # SUPABASE_SERVICE_ROLE_KEY; boot.py rejects it on startup. Do NOT add
-      # the legacy shared SUPABASE_JWT_SECRET.
+      # Supabase — anon key + debug-only service role fallback. Production must
+      # replace SUPABASE_SERVICE_ROLE_KEY with an asymmetric internal JWT signer
+      # secret (SUPABASE_INTERNAL_JWT_PRIVATE_JWK or
+      # VITA_AGENT_INTERNAL_JWT_PRIVATE_JWK). Do NOT add the legacy shared
+      # SUPABASE_JWT_SECRET.
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
-      - VITA_AGENT_INTERNAL_JWT_PRIVATE_JWK
+      - SUPABASE_SERVICE_ROLE_KEY
 
       # Aubrai scientist tool — HPKE seal target + x402 wallet
       - AUBRAI_HPKE_PUBLIC_KEY        # 32-byte hex; published by Aubrai
