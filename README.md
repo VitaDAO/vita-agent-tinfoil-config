@@ -12,7 +12,7 @@ This repo contains everything needed for independent verification:
 | `.github/workflows/tinfoil-build.yml` | Sigstore attestation workflow that runs on every release tag |
 
 Source code lives in [`VitaDAO/vita-agent`](https://github.com/VitaDAO/vita-agent).
-Container images are pulled from `ghcr.io/vitadao/vita-agent` and authenticated with `GHCR_TOKEN`.
+Container images are pulled from `ghcr.io/vitadao/vita-agent` and authenticated with `VITA_AGENT_GHCR_TOKEN`.
 
 ## What vita-agent does
 
@@ -25,12 +25,11 @@ Vita longevity app. Specifically:
 - Long-term encrypted memory (Active Memory pipeline + tools the LLM can call)
 - Aubrai scientist routing (HPKE-sealed + x402 USDC-on-Base micropayment)
 - Persona doc + auto fact extraction + thumbs-up/down feedback loop
-- Per-request RLS into Supabase — no service-role key in the enclave
+- Per-request RLS into Supabase with asymmetric internal JWTs for control-plane writes — no service-role key in the enclave
 
-It does NOT handle wearables (Oura/Whoop/Withings) — those run in a
-separate `tinfoil-proxy` enclave with scoped service-role access.
-That split is intentional: vita-agent's privacy claim depends on the
-"no service-role key" invariant.
+It does NOT handle wearables or raw lab PDF/image parsing — those run in the
+separate `vita-ingest` enclave. That split is intentional: vita-agent's privacy
+claim depends on keeping ingestion and private-AI orchestration separate.
 
 ## Privacy model
 
@@ -65,24 +64,24 @@ GitHub pre-release with the sigstore attestation bundle.
 ```bash
 # 1. In the source repo (VitaDAO/vita-agent), wait for CI to publish a new
 #    image to GHCR. Copy the sha256 digest.
-# 2. Edit tinfoil-config.yml: paste the new digest into containers[0].image,
-#    bump the version tag in the same string.
-# 3. Tag this repo:
-git tag v0.1.1
-git push origin v0.1.1
+# 2. Edit tinfoil-config.yml: paste the new digest into containers[0].image.
+# 3. Tag this repo, then deploy that tag as a non-debug Tinfoil container:
+git tag v0.10.0
+git push origin main v0.10.0
 ```
 
 The workflow attests the image, creates a pre-release with the bundle,
-and the Tinfoil dashboard auto-deploys.
+and the Tinfoil container can be launched from the signed tag.
 
 ## Required secrets (set in the Tinfoil dashboard)
 
 | Secret | Used by | Notes |
 |---|---|---|
-| `GHCR_TOKEN` | image pull | Read-only PAT for `ghcr.io/vitadao/vita-agent` |
+| `VITA_AGENT_GHCR_TOKEN` | image pull | Read-only PAT for `ghcr.io/vitadao/vita-agent` |
 | `TINFOIL_API_KEY` | every LLM call | Tinfoil Inference auth |
 | `SUPABASE_URL` | per-request RLS client | Same URL the browser uses |
 | `SUPABASE_ANON_KEY` | per-request RLS client | RLS-scoped, anonymous role |
+| `VITA_AGENT_INTERNAL_JWT_PRIVATE_JWK` | control-plane writes | Supabase asymmetric private JWK; signs short-lived `vita_agent_internal` JWTs |
 | `AUBRAI_HPKE_PUBLIC_KEY` | aubrai_scientist tool | 32-byte hex pubkey |
 | `X402_WALLET_PRIVATE_KEY` | aubrai_scientist tool | Funded Base mainnet wallet |
 | `SENTRY_DSN` | PHI-safe error monitoring | Optional; enables scrubbed Sentry events |
@@ -95,7 +94,8 @@ removes request bodies, headers, cookies, user identifiers, DEKs, prompts,
 health/lab/research payloads, and stack locals before sending events.
 
 `SUPABASE_SERVICE_ROLE_KEY` MUST NOT be added. `boot.py::_validate_storage_config`
-rejects any non-empty value at startup.
+rejects any non-empty value at startup unless the debug-only escape hatch is set;
+`STRICT_PROD=1` rejects that escape hatch as well.
 
 ## Coexistence with `aubrai-tinfoil-config`
 

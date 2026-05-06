@@ -1,4 +1,4 @@
-# Tinfoil Container Configuration — vita-agent
+# Tinfoil Container Configuration — vita-agent production
 #
 # PUBLIC REPO — this file is the attestation anchor.
 # Users verify the running enclave against the SHA256 digest pinned below.
@@ -8,7 +8,7 @@
 #   2. That repo's CI builds + pushes the image to GHCR
 #   3. Copy the new digest below + bump version
 #   4. Push a vX.Y.Z tag here → tinfoil-build.yml attests + creates pre-release
-#   5. Tinfoil dashboard detects the new tag and deploys automatically
+#   5. Deploy the tag as a non-debug Tinfoil container named vita-agent-prod
 
 cvm-version: 0.7.5
 cpus: 8         # Phase 1+3: 4 uvicorn workers, each forking subprocesses per request
@@ -26,37 +26,31 @@ containers:
       password_secret: VITA_AGENT_GHCR_TOKEN
 
     env:
-      # ⚠️ DEBUG MANIFEST — reviewer batch #3 (Task #218) clarification.
-      # This file is intentionally pre-cutover per user policy
-      # (memory: "stay on debug, don't trigger C.2 cutover"). The
-      # C.2 hardening envs (STRICT_PROD, OPENAI_AGENTS_DISABLE_TRACING,
-      # VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS=0,
-      # AAD_REQUIRED, V3_ASSEMBLER, EMBEDDINGS_V3) are NOT set here
-      # by design. AUBRAI_DEBUG=1 is also intentional — Aubrai
-      # traffic uses plaintext /api/chat for dev iteration.
-      #
-      # Production manifest sample with all C.2 envs lives at
-      # vita-agent/docs/C2_CUTOVER_PLAYBOOK.md §"Step 4 — Cutover
-      # env flips". Copy that block into this file's env: list,
-      # bump the image to a v0.9.x with all sweeps complete, and
-      # tag a non-debug release when you're actually flipping C.2.
-
-      # ── Non-sensitive runtime config (safe to commit) ──
+      # Production non-debug private-AI runtime. Staging points here first
+      # to prove attestation before the app production cutover.
       - VITA_AGENT_PORT: "8787"
       - STORAGE_BACKEND: "supabase"
 
-      # Production-mode hardening (partial — debug deploy)
+      # Production hardening gates
+      - STRICT_PROD: "1"
+      - AAD_REQUIRED: "1"
+      - VITA_ROUTING_MODE: "direct"
+      - OPENAI_AGENTS_DISABLE_TRACING: "1"
+      - VITA_AGENT_ENCLAVE_URL: "https://vita-agent-prod.vitality-now.containers.tinfoil.dev/"
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"      # Reject plaintext DEK headers
+      - VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS: "0"
       - VITA_AGENT_JSON_LOGS: "1"
-      - VITA_AGENT_DEBUG_JOB_ERROR_CLASS: "1"  # debug-only: safe exception class code for job E2E triage
+
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
-      # Tinfoil secret. Keep traces off by default; raise only for short
-      # debug windows after verifying scrubber behavior.
-      - SENTRY_ENVIRONMENT: "debug"
+      # Tinfoil secret. Keep traces/profiles off by default.
+      - SENTRY_ENVIRONMENT: "production"
       - SENTRY_TRACES_SAMPLE_RATE: "0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
+
+      # Supabase JWT verification + asymmetric internal writer signing.
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
       - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
+      - SUPABASE_INTERNAL_JWT_ALG: "RS256"
       # Note: no VITA_AGENT_ATTESTATION_MODE — attestation is served by
       # the cvmimage shim at /.well-known/tinfoil-attestation, not by
       # this workload. Removed in vita-agent v0.8.17.
@@ -66,7 +60,7 @@ containers:
       - VITA_AGENT_MAX_REQUEST_BYTES: "2097152"  # 2MB
 
       # Browser allowlist — origins that can hit /api/*
-      - VITA_AGENT_CORS_ORIGINS: "https://app.vitadao.com,https://staging-app.vitadao.com,https://vitadao-longevity-app.lovable.app,http://localhost:8000,http://127.0.0.1:8000"
+      - VITA_AGENT_CORS_ORIGINS: "https://app.vitadao.com,https://staging-app.vitadao.com"
 
       # Memory pipeline (bge-base default; downgrade to bge-small only if streaming
       # latency is a problem. Adaptive chunk size + adaptive K are always on.)
@@ -78,31 +72,15 @@ containers:
       # Auto fact extraction (Mem0-style) ON by default; set to "0" to disable
       - VITA_AGENT_AUTO_EXTRACT: "1"
 
-      # Debug/staging encrypted job autorunner. This claims browser-created
-      # long jobs (Research Radar, future async work) without requiring a
-      # manual /admin/jobs/run-one call. It uses the internal Supabase JWT
-      # signer secrets below; if those are unset, it logs and idles safely.
+      # Encrypted job autorunner. This claims browser-created long jobs
+      # (Research Radar, future async work) without any public admin drain route.
       - VITA_AGENT_JOB_AUTORUN: "1"
       - VITA_AGENT_JOB_AUTORUN_POLL_SECONDS: "2"
-      # DEBUG/STAGING ONLY: temporary control-plane writer fallback while the
-      # Supabase asymmetric internal JWT private key is being provisioned. The
-      # workload accepts SUPABASE_SERVICE_ROLE_KEY only when this flag is set;
-      # STRICT_PROD rejects this flag. Remove both before production cutover.
-      - VITA_AGENT_DEBUG_ALLOW_SERVICE_ROLE_INTERNAL_CLIENT: "1"
 
       # Aubrai routing
       - AUBRAI_MODE: "x402"
-
-      # v0.8.12: debug-mode flags (currently ON for dev iteration)
-      # AUBRAI_DEBUG=1 → use plaintext /api/chat instead of /api/chat/encrypted.
-      #   No HPKE seal/decrypt. Aubrai backend still receives HPKE
-      #   responses via their own enclave; we just don't HPKE the body.
-      #   x402 still applies (both endpoints are paywalled).
-      # AUBRAI_FAST=1 → set body {"fast": true} on /api/chat. Aubrai's
-      #   schema: fast=true returns ~3-6s conversational; fast=false
-      #   does ~15-25s deep research with citations.
-      # Set both to "0" or remove for production HPKE+deep mode.
-      - AUBRAI_DEBUG: "1"
+      # AUBRAI_DEBUG=0 forces the HPKE encrypted x402 Aubrai endpoint.
+      - AUBRAI_DEBUG: "0"
       - AUBRAI_FAST: "0"
 
       # LLM provider — Tinfoil Inference is the only allowed provider.
@@ -158,14 +136,11 @@ containers:
       # Sentry error monitoring. DSN is a secret in Tinfoil, never committed.
       - SENTRY_DSN
 
-      # Supabase — anon key + debug-only service role fallback. Production must
-      # replace SUPABASE_SERVICE_ROLE_KEY with an asymmetric internal JWT signer
-      # secret (SUPABASE_INTERNAL_JWT_PRIVATE_JWK or
-      # VITA_AGENT_INTERNAL_JWT_PRIVATE_JWK). Do NOT add the legacy shared
-      # SUPABASE_JWT_SECRET.
+      # Supabase — anon key plus asymmetric internal JWT signer. No service-role
+      # key is allowed in this production manifest.
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
-      - SUPABASE_SERVICE_ROLE_KEY
+      - VITA_AGENT_INTERNAL_JWT_PRIVATE_JWK
 
       # Aubrai scientist tool — HPKE seal target + x402 wallet
       - AUBRAI_HPKE_PUBLIC_KEY        # 32-byte hex; published by Aubrai
@@ -183,36 +158,7 @@ shim:
     # itself (cvmimage), so we don't list it here. The vita-agent
     # workload doesn't publish an attestation route as of v0.8.17.
 
-    # Authenticated AI endpoints
-    - /api/agent
-    - /api/intent/*
-    - /api/feedback
-
-    # v0.9.0 — capsule transport (sealed envelope path).
-    # Browser opt-in via localStorage `vita.useCapsule=1`; otherwise
-    # legacy /api/intent/* path remains the default during the
-    # dual-accept window (until C.2 cutover removes it).
+    # v1 capsule transport (sealed envelope path).
     - /api/v1/capsule
     - /api/v1/jobs
     - /api/v1/jobs/*
-
-    # v0.9.0 — admin endpoint for embedding compaction (returns 503 stub
-    # until admin DB credentials are wired at C.2).
-    - /admin/compact-embedding
-    # Debug deploy only: manually drains one long-task job inside a forked
-    # child using the same HPKE identity as the interactive server.
-    - /admin/jobs/run-one
-
-    # Sessions sidebar
-    - /api/sessions
-    - /api/sessions/*
-
-    # Legacy aliases — accepted for the vita-app-v2 migration window
-    - /api/aubrai-x402-chat
-    - /api/aubrai-x402-daily-insight
-    - /api/aubrai-x402-status
-    - /api/refine-protocol
-    - /api/generate-protocol
-    - /api/generate-protocol-status
-    - /api/parse-supplement
-    - /api/suggest-condition
