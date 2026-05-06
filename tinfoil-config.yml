@@ -33,7 +33,10 @@ containers:
 
       # Production hardening gates
       - STRICT_PROD: "1"
-      - AAD_REQUIRED: "1"
+      # Keep legacy no-AAD decrypt fallback enabled while staging validates
+      # existing encrypted rows. New writes remain AAD-bound in app/agent code;
+      # flip to "1" only after the legacy row migration/backfill passes.
+      - AAD_REQUIRED: "0"
       - VITA_ROUTING_MODE: "direct"
       - OPENAI_AGENTS_DISABLE_TRACING: "1"
       - VITA_AGENT_ENCLAVE_URL: "https://vita-agent-prod.vitality-now.containers.tinfoil.dev/"
