@@ -12,7 +12,7 @@
 
 cvm-version: 0.7.5
 cpus: 8         # Phase 1+3: 4 uvicorn workers, each forking subprocesses per request
-memory: 32768   # 32 GB — workers + per-request child processes + sandbox memory headroom
+memory: 16384   # 16 GB — initial prod-attested headroom; tune after real capsule/job telemetry
 
 containers:
   - name: vita-agent
