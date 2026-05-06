@@ -25,7 +25,7 @@ Vita longevity app. Specifically:
 - Long-term encrypted memory (Active Memory pipeline + tools the LLM can call)
 - Aubrai scientist routing (HPKE-sealed + x402 USDC-on-Base micropayment)
 - Persona doc + auto fact extraction + thumbs-up/down feedback loop
-- Per-request RLS into Supabase with asymmetric internal JWTs for control-plane writes — no service-role key in the enclave
+- Per-request RLS into Supabase by forwarding the user's Supabase JWT — no service-role key or Supabase private signing key in the enclave for the v1 production path
 
 It does NOT handle wearables or raw lab PDF/image parsing — those run in the
 separate `vita-ingest` enclave. That split is intentional: vita-agent's privacy
@@ -81,7 +81,6 @@ and the Tinfoil container can be launched from the signed tag.
 | `TINFOIL_API_KEY` | every LLM call | Tinfoil Inference auth |
 | `SUPABASE_URL` | per-request RLS client | Same URL the browser uses |
 | `SUPABASE_ANON_KEY` | per-request RLS client | RLS-scoped, anonymous role |
-| `VITA_AGENT_INTERNAL_JWT_PRIVATE_JWK` | control-plane writes | Supabase asymmetric private JWK; signs short-lived `vita_agent_internal` JWTs |
 | `AUBRAI_HPKE_PUBLIC_KEY` | aubrai_scientist tool | 32-byte hex pubkey |
 | `X402_WALLET_PRIVATE_KEY` | aubrai_scientist tool | Funded Base mainnet wallet |
 | `SENTRY_DSN` | PHI-safe error monitoring | Optional; enables scrubbed Sentry events |

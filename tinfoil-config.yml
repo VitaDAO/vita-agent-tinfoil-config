@@ -47,10 +47,11 @@ containers:
       - SENTRY_TRACES_SAMPLE_RATE: "0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
-      # Supabase JWT verification + asymmetric internal writer signing.
+      # Supabase JWT verification. User-triggered capsule/job requests forward
+      # the user's Supabase JWT; no Supabase signing key or service-role key is
+      # required for the v1 production path.
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
       - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
-      - SUPABASE_INTERNAL_JWT_ALG: "RS256"
       # Note: no VITA_AGENT_ATTESTATION_MODE — attestation is served by
       # the cvmimage shim at /.well-known/tinfoil-attestation, not by
       # this workload. Removed in vita-agent v0.8.17.
@@ -72,10 +73,10 @@ containers:
       # Auto fact extraction (Mem0-style) ON by default; set to "0" to disable
       - VITA_AGENT_AUTO_EXTRACT: "1"
 
-      # Encrypted job autorunner. This claims browser-created long jobs
-      # (Research Radar, future async work) without any public admin drain route.
-      - VITA_AGENT_JOB_AUTORUN: "1"
-      - VITA_AGENT_JOB_AUTORUN_POLL_SECONDS: "2"
+      # Encrypted job runner. Production v1 does not run a durable internal
+      # autorunner; the browser creates a job and immediately triggers
+      # /api/v1/jobs/{id}/run with the user's RLS-scoped Supabase JWT.
+      - VITA_AGENT_JOB_AUTORUN: "0"
 
       # Aubrai routing
       - AUBRAI_MODE: "x402"
@@ -136,11 +137,10 @@ containers:
       # Sentry error monitoring. DSN is a secret in Tinfoil, never committed.
       - SENTRY_DSN
 
-      # Supabase — anon key plus asymmetric internal JWT signer. No service-role
-      # key is allowed in this production manifest.
+      # Supabase — anon key only. User JWTs are forwarded for RLS-scoped writes;
+      # no service-role key or Supabase private signing key is allowed here.
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
-      - VITA_AGENT_INTERNAL_JWT_PRIVATE_JWK
 
       # Aubrai scientist tool — HPKE seal target + x402 wallet
       - AUBRAI_HPKE_PUBLIC_KEY        # 32-byte hex; published by Aubrai
