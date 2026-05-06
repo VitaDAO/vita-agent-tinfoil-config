@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:63b7bf4d84379bc6790dd5a1d2604f92359cc88d@sha256:d175ea1e684d7f8a3590b8926dd210362d91890b0c437c68fb062722ebced3f8"
+    image: "ghcr.io/vitadao/vita-agent:8fee3ad38888d7e1d55e801810ae42efeadc3b17@sha256:77c7a0a51532778a5e4b063978b6c5e47b44192ee635678b29b4e47b996442aa"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -47,9 +47,10 @@ containers:
       - SENTRY_TRACES_SAMPLE_RATE: "0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
-      # Supabase JWT verification. User-triggered capsule/job requests forward
-      # the user's Supabase JWT; no Supabase signing key or service-role key is
-      # required for the v1 production path.
+      # Supabase JWT verification. User-facing data reads/writes forward the
+      # user's Supabase JWT. Control-plane replay/audit/cost rows use a
+      # Supabase Auth machine user with app_metadata.vita_agent_internal=true,
+      # so no Supabase signing key or service-role key is required.
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
       - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
       # Note: no VITA_AGENT_ATTESTATION_MODE — attestation is served by
@@ -137,10 +138,12 @@ containers:
       # Sentry error monitoring. DSN is a secret in Tinfoil, never committed.
       - SENTRY_DSN
 
-      # Supabase — anon key only. User JWTs are forwarded for RLS-scoped writes;
-      # no service-role key or Supabase private signing key is allowed here.
+      # Supabase. User JWTs are forwarded for user-scoped data; the machine
+      # user token is only for internal replay/audit/cost RLS policies.
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
+      - SUPABASE_INTERNAL_AUTH_EMAIL
+      - SUPABASE_INTERNAL_AUTH_PASSWORD
 
       # Aubrai scientist tool — HPKE seal target + x402 wallet
       - AUBRAI_HPKE_PUBLIC_KEY        # 32-byte hex; published by Aubrai
