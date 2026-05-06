@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:246967647bdf4916710e7ce0c965233ba7aa12d3@sha256:286fd41c0a009688823d4a11133b7dd122bc3258f25275a6ca77bdb98f7f57c0"
+    image: "ghcr.io/vitadao/vita-agent:27b3521f470c671875b4b475e9ca43d4e8d1a9ae@sha256:da1b97d484d0e5edfbbee506319109d6ac12c8114d89b5b82ce76023c6ddd1c1"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
