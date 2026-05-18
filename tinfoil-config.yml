@@ -47,8 +47,8 @@ containers:
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@b45791c517bc"
-      - VITA_AGENT_VERSION: "vita-agent@b45791c517bc"
+      - SENTRY_RELEASE: "vita-agent@468aeca677ef"
+      - VITA_AGENT_VERSION: "vita-agent@468aeca677ef"
       - SENTRY_TRACES_SAMPLE_RATE: "0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
