@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:468aeca677eff96e187513ccceef0f600f7b5988@sha256:b4b738f8bc01931bba49b888bb88acf34af969d7a34d7ea8c46d4f7e42ce8fc3"
+    image: "ghcr.io/vitadao/vita-agent:a0738603357bcb07ae3ffd3cbae70ec5e2623661@sha256:c1ff75c851e6d5380394a2d7e47839c374e06d93a2ca00ec8c594bdc9e726200"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -47,8 +47,8 @@ containers:
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@468aeca677ef"
-      - VITA_AGENT_VERSION: "vita-agent@468aeca677ef"
+      - SENTRY_RELEASE: "vita-agent@a0738603357b"
+      - VITA_AGENT_VERSION: "vita-agent@a0738603357b"
       - SENTRY_TRACES_SAMPLE_RATE: "0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
