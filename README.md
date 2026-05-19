@@ -14,16 +14,6 @@ This repo contains everything needed for independent verification:
 Source code lives in [`VitaDAO/vita-agent`](https://github.com/VitaDAO/vita-agent).
 Container images are pulled from `ghcr.io/vitadao/vita-agent` and authenticated with `VITA_AGENT_GHCR_TOKEN`.
 
-Current pinned deployment:
-
-| Item | Value |
-|---|---|
-| Source commit | `468aeca677eff96e187513ccceef0f600f7b5988` |
-| Runtime release | `vita-agent@468aeca677ef` |
-| Tinfoil tag | `v0.10.20` |
-| Image | `ghcr.io/vitadao/vita-agent:468aeca677eff96e187513ccceef0f600f7b5988@sha256:b4b738f8bc01931bba49b888bb88acf34af969d7a34d7ea8c46d4f7e42ce8fc3` |
-| Live endpoint | `https://vita-agent-prod.vitality-now.containers.tinfoil.dev` |
-
 ## What vita-agent does
 
 vita-agent is a single Tinfoil enclave that handles the AI portion of the
@@ -72,52 +62,16 @@ GitHub pre-release with the sigstore attestation bundle.
 ## Deploy a new version
 
 ```bash
-# 1. In the source repo, wait for CI to publish a new image to GHCR.
-cd /Users/alexdobrin/Documents/vita-agent
-set -a; source /Users/alexdobrin/Documents/vita-app-v2/.env_agent; set +a
-git log -1 --oneline
-gh run list -R VitaDAO/vita-agent -w "Build vita-agent container" --commit <sha> --limit 5
-gh run view <run-id> -R VitaDAO/vita-agent --log | rg "Digest:|Tags:"
-
-# 2. In this repo, pin the new digest and release metadata.
-cd /Users/alexdobrin/Documents/vita-agent-tinfoil-config
-$EDITOR tinfoil-config.yml
-
-# 3. Commit and tag the config repo.
-git add tinfoil-config.yml
-git commit -m "deploy: pin vita-agent <sha>"
-git tag v0.10.X
-git push origin main v0.10.X
+# 1. In the source repo (VitaDAO/vita-agent), wait for CI to publish a new
+#    image to GHCR. Copy the sha256 digest.
+# 2. Edit tinfoil-config.yml: paste the new digest into containers[0].image.
+# 3. Tag this repo, then deploy that tag as a non-debug Tinfoil container:
+git tag v0.10.0
+git push origin main v0.10.0
 ```
 
-The workflow attests the image and creates a pre-release with the bundle. After
-that, relaunch the existing non-debug Tinfoil container `vita-agent-prod` to
-the new tag from the dashboard or admin API.
-
-Keep these fields aligned on every deploy:
-
-| Field | Required value |
-|---|---|
-| `containers[0].image` | immutable GHCR image with `@sha256:<digest>` |
-| `SENTRY_RELEASE` | `vita-agent@<short source sha>` |
-| `VITA_AGENT_VERSION` | same as `SENTRY_RELEASE` |
-| git tag | monotonic `v0.10.X` release tag |
-
-Local operator tokens are not stored in this repo. Source them from the app
-repo's local-only `.env_agent`:
-
-```bash
-set -a
-source /Users/alexdobrin/Documents/vita-app-v2/.env_agent
-set +a
-```
-
-Useful post-relaunch checks:
-
-```bash
-curl -fsS https://vita-agent-prod.vitality-now.containers.tinfoil.dev/api/health | jq .
-curl -fsS https://vita-agent-prod.vitality-now.containers.tinfoil.dev/.well-known/enclave-pubkey | jq .
-```
+The workflow attests the image, creates a pre-release with the bundle,
+and the Tinfoil container can be launched from the signed tag.
 
 ## Required secrets (set in the Tinfoil dashboard)
 
