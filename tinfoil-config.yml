@@ -146,12 +146,21 @@ containers:
       # - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
       # - REDPILL_REQUIRE_ATTESTATION: "1"     # fail-closed (default)
       # - REDPILL_REQUIRE_GPU_ATTESTATION: "1" # require NVIDIA GPU attestation
-      # - REDPILL_PIN_MRTD: ""                 # fill from a dcap-qvl-verified quote
-      # - REDPILL_PIN_RTMR0: ""
-      # - REDPILL_PIN_RTMR1: ""
-      # - REDPILL_PIN_RTMR2: ""
-      # - REDPILL_PIN_RTMR3: ""
-      # - REDPILL_PIN_APP_ID: ""               # gateway dstack app_id
+      # Pins below were AUTHENTICATED via dcap-qvl against api.redpill.ai
+      # phala/qwen3.6-35b-a3b on 2026-06-12 (tcb_status=UpToDate). MRTD +
+      # RTMR0/1/2 were stable across samples; RTMR3 is per-instance (varies),
+      # so it is deliberately NOT pinned. PROVENANCE CAVEAT: these are observed
+      # from the live endpoint — before enabling, cross-check them against
+      # RedPill/Phala's published reproducible-build measurements so we pin to
+      # the intended image, not just "whatever answered". Re-pin when RedPill
+      # updates the gateway image/kernel (MRTD/RTMR0-2 change legitimately).
+      # - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
+      # - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
+      # - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
+      # - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
+      # (RTMR3 intentionally omitted — per-instance runtime measurement)
+      # (REDPILL_PIN_APP_ID omitted — dstack app_id needs event-log replay to
+      #  authenticate; the agent leaves it unauthenticated for now)
 
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
