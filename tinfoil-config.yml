@@ -129,6 +129,30 @@ containers:
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_MODEL: "gemma4-31b"
 
+      # ── STAGED, NOT ENABLED: RedPill/Phala confidential inference ─────────
+      # 2026-06-12. Everything below is commented so prod stays on
+      # tinfoil/gemma4-31b. DO NOT uncomment until ALL of these land + pass a
+      # security review (see vita-agent PR #19):
+      #   1. dcap-qvl bundled in the image + _DcapQuoteVerifier implemented
+      #   2. NVIDIA GPU attestation verifier wired
+      #   3. egress allowlist opened for api.redpill.ai + Intel PCCS / NVIDIA NRAS
+      #   4. the REDPILL_PIN_* values below filled from a verified quote
+      # With STRICT_PROD=1 and no verifier, the gate fails closed and refuses
+      # to send PHI — so a premature flip degrades to "chat 503", never "PHI
+      # leaks to an unverified endpoint". Model MUST run thinking-off for chat
+      # (handled per-intent in the agent). To enable: uncomment, set pins,
+      # uncomment REDPILL_API_KEY in secrets, bump version, tag, redeploy.
+      # - VITA_AGENT_MODEL_PROVIDER: "redpill"
+      # - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
+      # - REDPILL_REQUIRE_ATTESTATION: "1"     # fail-closed (default)
+      # - REDPILL_REQUIRE_GPU_ATTESTATION: "1" # require NVIDIA GPU attestation
+      # - REDPILL_PIN_MRTD: ""                 # fill from a dcap-qvl-verified quote
+      # - REDPILL_PIN_RTMR0: ""
+      # - REDPILL_PIN_RTMR1: ""
+      # - REDPILL_PIN_RTMR2: ""
+      # - REDPILL_PIN_RTMR3: ""
+      # - REDPILL_PIN_APP_ID: ""               # gateway dstack app_id
+
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
       # Set each in the Tinfoil Dashboard > Secrets BEFORE first deploy.
@@ -139,6 +163,14 @@ containers:
 
       # Tinfoil Inference (LLM) auth
       - TINFOIL_API_KEY
+
+      # RedPill/Phala confidential inference (LLM) auth — STAGED, NOT ENABLED.
+      # The org secret already exists in the Tinfoil dashboard (created
+      # 2026-06-12). Listing it here would inject it on the next relaunch; kept
+      # commented so it stays out of the enclave until the redpill provider is
+      # actually turned on (see the staged env block above). Uncomment together
+      # with VITA_AGENT_MODEL_PROVIDER=redpill.
+      # - REDPILL_API_KEY
 
       # Sentry error monitoring. DSN is a secret in Tinfoil, never committed.
       - SENTRY_DSN
