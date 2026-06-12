@@ -126,26 +126,25 @@ containers:
       # in 3ms; k2-5 absent from the model list. Other available kimi-class
       # alternatives if k2-6 ever rotates: gemma4-31b, llama3-3-70b,
       # gpt-oss-120b (all returned 200 in the same probe).
-      # ── ENABLED 2026-06-12: RedPill/Phala confidential inference (qwen3.6) ─
-      # Operator-accepted trade-off. Attestation STRICT + GPU required → if the
-      # in-enclave TDX/GPU/pin verification fails, chat 503s (never leaks PHI);
-      # revert to the gemma/tinfoil block below to roll back. temp=0.2 + the
-      # two-rule SAFETY prompt = stable 17/17 routing (docs/redpill-qwen-safe-config.md).
-      - VITA_AGENT_MODEL_PROVIDER: "redpill"
-      - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
-      - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
-      - REDPILL_E2EE: "1"                    # client-side ECIES encrypt-to-enclave
-      - REDPILL_REQUIRE_ATTESTATION: "1"
-      - REDPILL_REQUIRE_GPU_ATTESTATION: "1"
-      - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
-      - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
-      - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
-      - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
-      # ROLLBACK: comment the redpill block above + uncomment these two lines.
-      # - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      # - VITA_AGENT_MODEL: "gemma4-31b"
+      # ── ROLLED BACK 2026-06-13: RedPill/Phala confidential inference ─────
+      # Keep RedPill staged, not live, until the endpoint passes strict
+      # attestation (current live report is TCB=OutOfDate) and the dashboard
+      # REDPILL_API_KEY secret is confirmed. Tinfoil restores chat uptime while
+      # preserving private inference semantics.
+      - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
+      - VITA_AGENT_MODEL: "gemma4-31b"
+      # - VITA_AGENT_MODEL_PROVIDER: "redpill"
+      # - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
+      # - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
+      # - REDPILL_E2EE: "1"                    # client-side ECIES encrypt-to-enclave
+      # - REDPILL_REQUIRE_ATTESTATION: "1"
+      # - REDPILL_REQUIRE_GPU_ATTESTATION: "1"
+      # - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
+      # - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
+      # - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
+      # - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
 
-      # ── Reference (superseded by the ENABLED block above) ─────────────────
+      # ── Reference (staged RedPill block; not live) ────────────────────────
       # 2026-06-12. Everything below is commented so prod stays on
       # tinfoil/gemma4-31b. DO NOT uncomment until ALL of these land + pass a
       # security review (see vita-agent PR #19):
@@ -190,12 +189,9 @@ containers:
       - TINFOIL_API_KEY
 
       # RedPill/Phala confidential inference (LLM) auth — STAGED, NOT ENABLED.
-      # The org secret already exists in the Tinfoil dashboard (created
-      # 2026-06-12). Listing it here would inject it on the next relaunch; kept
-      # commented so it stays out of the enclave until the redpill provider is
-      # actually turned on (see the staged env block above). Uncomment together
-      # with VITA_AGENT_MODEL_PROVIDER=redpill.
-      - REDPILL_API_KEY
+      # Uncomment together with VITA_AGENT_MODEL_PROVIDER=redpill after
+      # dashboard secret injection and strict attestation have both passed.
+      # - REDPILL_API_KEY
 
       # Sentry error monitoring. DSN is a secret in Tinfoil, never committed.
       - SENTRY_DSN
