@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:5c6f96c7983dac5fbf096d6531163d7ce6ce5717@sha256:ec9ef3d530f01cc75959bf6490871b2d484f0709a210d3345917b19ce6661588"
+    image: "ghcr.io/vitadao/vita-agent:cb6aa9df4990af819e158a969dda078df406f297@sha256:eb8d751f4be2750e496e050b3f20b0e85642473642016d23b1fc503adb56319f"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -47,8 +47,8 @@ containers:
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@5c6f96c"
-      - VITA_AGENT_VERSION: "vita-agent@5c6f96c"
+      - SENTRY_RELEASE: "vita-agent@cb6aa9d"
+      - VITA_AGENT_VERSION: "vita-agent@cb6aa9d"
       - SENTRY_TRACES_SAMPLE_RATE: "0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
@@ -126,24 +126,26 @@ containers:
       # in 3ms; k2-5 absent from the model list. Other available kimi-class
       # alternatives if k2-6 ever rotates: gemma4-31b, llama3-3-70b,
       # gpt-oss-120b (all returned 200 in the same probe).
-      # ── ENABLED 2026-06-13: RedPill/Phala confidential inference ─────────
-      # Re-enabled only after (1) vita-agent@5c6f96c fixed the awaited
-      # fail-closed attestation gate and (2) the live RedPill report passed
-      # strict TDX/GPU/pin verification. If this regresses, roll back to the
-      # tinfoil/gemma4-31b block in the reference section below.
-      - VITA_AGENT_MODEL_PROVIDER: "redpill"
-      - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
-      - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
-      - REDPILL_E2EE: "1"                    # client-side ECIES encrypt-to-enclave
-      - REDPILL_REQUIRE_ATTESTATION: "1"
-      - REDPILL_REQUIRE_GPU_ATTESTATION: "1"
-      - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
-      - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
-      - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
-      - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
-      # ROLLBACK: comment the redpill block above + uncomment these two lines.
-      # - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      # - VITA_AGENT_MODEL: "gemma4-31b"
+      # ── ROLLBACK 2026-06-13: Tinfoil/gemma while RedPill TCB is OutOfDate ──
+      # RedPill's current report verifies cryptographically but reports
+      # TDX TCB status OutOfDate. Keeping STRICT_PROD fail-closed means we
+      # must not send user prompts there until RedPill/Phala returns UpToDate
+      # or we explicitly review and accept the listed advisories. Use the
+      # known-good Tinfoil provider to keep user chat available.
+      - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
+      - VITA_AGENT_MODEL: "gemma4-31b"
+      # REDPILL RE-ENABLE: comment the Tinfoil block above + uncomment below
+      # only after strict attestation passes again.
+      # - VITA_AGENT_MODEL_PROVIDER: "redpill"
+      # - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
+      # - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
+      # - REDPILL_E2EE: "1"                    # client-side ECIES encrypt-to-enclave
+      # - REDPILL_REQUIRE_ATTESTATION: "1"
+      # - REDPILL_REQUIRE_GPU_ATTESTATION: "1"
+      # - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
+      # - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
+      # - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
+      # - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
 
       # ── Reference (RedPill attestation requirements) ──────────────────────
       # 2026-06-12. RedPill must remain strict-fail-closed and should only stay
