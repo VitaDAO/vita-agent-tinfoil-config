@@ -135,7 +135,6 @@ containers:
       # tinfoil/gemma4-31b block below if RedPill chat regresses.
       - VITA_AGENT_MODEL_PROVIDER: "redpill"
       - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
-      - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
       - REDPILL_E2EE: "1"                    # client-side ECIES encrypt-to-enclave
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
