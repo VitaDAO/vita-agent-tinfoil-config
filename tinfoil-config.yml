@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:746a295f94fc03bfd1cd2ff700748207fd3b55b8@sha256:b2b138fce0bf17059eee9d9693d2b61bd333c4f6240da1756ecb1ae37c111cd0"
+    image: "ghcr.io/vitadao/vita-agent:c56f7fd7374c96d0362d21817b5896dc96793ccc@sha256:bbe4436700191d7b5ca5974cb14df91829123ee23d51e3934270feef33b7f17d"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -47,8 +47,8 @@ containers:
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@746a295"
-      - VITA_AGENT_VERSION: "vita-agent@746a295"
+      - SENTRY_RELEASE: "vita-agent@c56f7fd"
+      - VITA_AGENT_VERSION: "vita-agent@c56f7fd"
       - SENTRY_TRACES_SAMPLE_RATE: "0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
@@ -138,6 +138,8 @@ containers:
       - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
       - REDPILL_E2EE: "1"                    # client-side ECIES encrypt-to-enclave
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
+      - REDPILL_ATTESTATION_RETRIES: "6"     # sample across RedPill's load-balanced Phala reports
+      - REDPILL_ATTESTATION_RETRY_BACKOFF_S: "0.5"
       - REDPILL_REQUIRE_ATTESTATION: "1"
       - REDPILL_REQUIRE_GPU_ATTESTATION: "1"
       - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
