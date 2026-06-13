@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:dd87585ae85d785a0662346b8bd9e630f67b996b@sha256:a76d1b4fe84ae7bcb8dd75341732edd571cf5fa3ac5c08469c99e342ef93762a"
+    image: "ghcr.io/vitadao/vita-agent:e4745a3cf59e37833bf92404bf413e8d70aa0faf@sha256:6080dda0891e2e3647c32d49a7d42ea924be3e6aad06a198339959ba15f648ad"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -47,8 +47,8 @@ containers:
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@dd87585"
-      - VITA_AGENT_VERSION: "vita-agent@dd87585"
+      - SENTRY_RELEASE: "vita-agent@e4745a3"
+      - VITA_AGENT_VERSION: "vita-agent@e4745a3"
       - SENTRY_TRACES_SAMPLE_RATE: "0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
@@ -135,6 +135,7 @@ containers:
       # tinfoil/gemma4-31b block below if RedPill chat regresses.
       - VITA_AGENT_MODEL_PROVIDER: "redpill"
       - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
+      - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
       - REDPILL_E2EE: "1"                    # client-side ECIES encrypt-to-enclave
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
