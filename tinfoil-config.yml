@@ -133,12 +133,14 @@ containers:
       # does NOT enforce local dcap-qvl TCB status because Phala's light API
       # does not expose tcb_status/advisories. Roll back to the commented
       # tinfoil/gemma4-31b block below if RedPill chat regresses.
-      - VITA_AGENT_MODEL_PROVIDER: "redpill"
-      # TEMP FAILOVER 2026-06-15: phala/qwen3.6-35b-a3b is 502-ing upstream
-      # (RedPill/Phala). Switched to qwen3-30b-a3b-instruct-2507 — same gateway
-      # attestation (pins unchanged), confidential, aligned (passed the vit-D
-      # safety probe), ~157 tok/s. REVERT to qwen3.6-35b-a3b when it recovers.
-      - VITA_AGENT_MODEL: "phala/qwen3-30b-a3b-instruct-2507"
+      # SWITCHED 2026-06-15 → tinfoil/gemma4-31b (see active lines below).
+      # RedPill's phala/qwen3.6-35b-a3b 502'd upstream (provider near-ai); the
+      # qwen3-30b-a3b-instruct-2507 "failover" routes to the SAME near-ai
+      # backend so it shared fate. Reverting to gemma4-31b on Tinfoil's own
+      # confidential inference (independent infra, prior prod model, 17/17 on
+      # the routing/honesty test). REVERT to RedPill by swapping the comments.
+      # - VITA_AGENT_MODEL_PROVIDER: "redpill"
+      # - VITA_AGENT_MODEL: "phala/qwen3-30b-a3b-instruct-2507"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
       - REDPILL_E2EE: "1"                    # client-side ECIES encrypt-to-enclave
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
@@ -150,9 +152,9 @@ containers:
       - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
       - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
       - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
-      # ROLLBACK: comment the redpill block above + uncomment these two lines.
-      # - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      # - VITA_AGENT_MODEL: "gemma4-31b"
+      # ACTIVE 2026-06-15: Tinfoil confidential inference (gemma4-31b).
+      - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
+      - VITA_AGENT_MODEL: "gemma4-31b"
 
       # ── Reference (RedPill attestation requirements) ──────────────────────
       # 2026-06-12. RedPill must remain strict-fail-closed and should only stay
