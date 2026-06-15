@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:ffbc09780ac5a92479142e2a640244072289afd8@sha256:dbfc5972b2a305725f0f6e3d3d7e3886f64310aa25b2849fb87762135ecbaefa"
+    image: "ghcr.io/vitadao/vita-agent:8e8cf7286d7ad8a2fc32ce3d97d11f07463d9f77@sha256:fe6013899d50a0eaa5f8a682cfd5d4b572d380dee3faa945f4a2210b5d6b3076"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -30,13 +30,6 @@ containers:
       # to prove attestation before the app production cutover.
       - VITA_AGENT_PORT: "8787"
       - STORAGE_BACKEND: "supabase"
-
-      # Need/Fill retrieval loop. Capability-gated in the handler: the tool +
-      # need_request path activate ONLY for requests that advertise
-      # client_capabilities:["need_fill_v1"] (i.e. an app build with
-      # VITE_ENABLE_NEED_FILL on), so this is byte-identical for every other
-      # client on this shared enclave.
-      - VITA_AGENT_ENABLE_NEED_FILL: "1"
 
       # Production hardening gates
       - STRICT_PROD: "1"
@@ -54,8 +47,8 @@ containers:
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@ffbc097"
-      - VITA_AGENT_VERSION: "vita-agent@ffbc097"
+      - SENTRY_RELEASE: "vita-agent@8e8cf72"
+      - VITA_AGENT_VERSION: "vita-agent@8e8cf72"
       - SENTRY_TRACES_SAMPLE_RATE: "1.0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
