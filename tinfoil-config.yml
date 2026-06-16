@@ -138,8 +138,9 @@ containers:
       # alternatives if k2-6 ever rotates: gemma4-31b, llama3-3-70b,
       # gpt-oss-120b (all returned 200 in the same probe).
       # RedPill interim — tinfoil/gemma still ConnectTimeout on inf6 (v0.10.78 retest).
+      # v0.10.83: phala/qwen3.6-35b-a3b → z-ai/glm-5.2 (RedPill confidential GLM).
       - VITA_AGENT_MODEL_PROVIDER: "redpill"
-      - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
+      - VITA_AGENT_MODEL: "z-ai/glm-5.2"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
       - REDPILL_E2EE: "1"
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
