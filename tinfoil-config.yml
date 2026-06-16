@@ -52,6 +52,10 @@ containers:
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"      # Reject plaintext DEK headers
       - VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS: "0"
       - VITA_AGENT_JSON_LOGS: "1"
+      # TEMP (v0.10.65): enable /api/health?model=1&fresh=1 to time the
+      # verified-client construction IN-ENCLAVE (latency root-cause probe).
+      # Remove after measurement.
+      - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
 
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
