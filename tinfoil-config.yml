@@ -53,7 +53,7 @@ containers:
       - VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS: "0"
       - VITA_AGENT_JSON_LOGS: "1"
       # Off — was a temporary Jun 16 latency probe (v0.10.65).
-      - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "0"
+      - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
 
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
@@ -137,26 +137,23 @@ containers:
       # in 3ms; k2-5 absent from the model list. Other available kimi-class
       # alternatives if k2-6 ever rotates: gemma4-31b, llama3-3-70b,
       # gpt-oss-120b (all returned 200 in the same probe).
-      # 2026-06-16: RedPill interim — enclave ConnectTimeout to *.tinfoil.sh
-      # (hairpin on control.inf6.tinfoil.sh). api.redpill.ai is reachable.
-      # Swap back to the commented tinfoil/gemma block once Tinfoil restores
-      # inference/router egress (regression since Jun 15; worked Jun 10–15).
-      - VITA_AGENT_MODEL_PROVIDER: "redpill"
-      - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
+      # June 10 path — tinfoil/gemma4-31b (retry after v0.10.77 RedPill interim).
+      - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
+      - VITA_AGENT_MODEL: "gemma4-31b"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
-      - REDPILL_E2EE: "1"
-      - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
-      - REDPILL_ATTESTATION_RETRIES: "6"
-      - REDPILL_ATTESTATION_RETRY_BACKOFF_S: "0.5"
-      - REDPILL_REQUIRE_ATTESTATION: "1"
-      - REDPILL_REQUIRE_GPU_ATTESTATION: "1"
-      - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
-      - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
-      - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
-      - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
-      # Target (June 10 path) — re-enable when Tinfoil fixes inf6 egress:
-      # - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      # - VITA_AGENT_MODEL: "gemma4-31b"
+      # RedPill fallback (v0.10.77) — uncomment if tinfoil egress still blocked:
+      # - VITA_AGENT_MODEL_PROVIDER: "redpill"
+      # - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
+      # - REDPILL_E2EE: "1"
+      # - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
+      # - REDPILL_ATTESTATION_RETRIES: "6"
+      # - REDPILL_ATTESTATION_RETRY_BACKOFF_S: "0.5"
+      # - REDPILL_REQUIRE_ATTESTATION: "1"
+      # - REDPILL_REQUIRE_GPU_ATTESTATION: "1"
+      # - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
+      # - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
+      # - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
+      # - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
 
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
