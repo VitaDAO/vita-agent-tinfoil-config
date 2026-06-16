@@ -138,10 +138,9 @@ containers:
       # alternatives if k2-6 ever rotates: gemma4-31b, llama3-3-70b,
       # gpt-oss-120b (all returned 200 in the same probe).
       # RedPill interim — tinfoil/gemma still ConnectTimeout on inf6 (v0.10.78 retest).
-      # v0.10.83: phala/qwen3.6-35b-a3b → z-ai/glm-5.2 (RedPill confidential GLM).
-      # v0.10.84: flat attestation normalize (vita-agent@39f9b99) + glm-5.2 pins.
+      # v0.10.85: revert z-ai/glm-5.2 → phala/qwen3.6-35b-a3b (proven RedPill path).
       - VITA_AGENT_MODEL_PROVIDER: "redpill"
-      - VITA_AGENT_MODEL: "z-ai/glm-5.2"
+      - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
       - REDPILL_E2EE: "1"
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
@@ -149,10 +148,10 @@ containers:
       - REDPILL_ATTESTATION_RETRY_BACKOFF_S: "0.5"
       - REDPILL_REQUIRE_ATTESTATION: "1"
       - REDPILL_REQUIRE_GPU_ATTESTATION: "1"
-      - REDPILL_PIN_MRTD: "b24d3b24e9e3c16012376b52362ca09856c4adecb709d5fac33addf1c47e193da075b125b6c364115771390a5461e217"
-      - REDPILL_PIN_RTMR0: "90550e56509b94f99f4670a563e0dd0a2fa79b6d7b97fd52d051069d1b33d270b1858120034a43dac4f8daf509f2aeda"
-      - REDPILL_PIN_RTMR1: "07e6f51aa763abfe75c3ddfbf4f425fe3f0ceff66d807a75e049303dce9addf68e7218729bd419638af63a370f65878c"
-      - REDPILL_PIN_RTMR2: "c2127bb06555d6b1136dc9f43b6bee92120d0a84842277788c6ced33230ecfcd43a0e4b9e6c39096e05414d19556f3f7"
+      - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
+      - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
+      - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
+      - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
       # June 10 target — enable when Tinfoil fixes inf6 egress:
       # - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       # - VITA_AGENT_MODEL: "gemma4-31b"
