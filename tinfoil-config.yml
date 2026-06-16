@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:v0.10.72@sha256:e70c989d71f9eefa9001a5aa01861eb933fa6761f608506cdc1bcad4e839d945"
+    image: "ghcr.io/vitadao/vita-agent:083cae3c885bf816a366df3d875cddd6da6cde2d@sha256:91d16828b8e1a22d8c0db3ecf35a9e809e32152b861d98f63cf56e7993ca5895"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -60,8 +60,8 @@ containers:
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@6f9c0b7"
-      - VITA_AGENT_VERSION: "vita-agent@6f9c0b7"
+      - SENTRY_RELEASE: "vita-agent@083cae3"
+      - VITA_AGENT_VERSION: "vita-agent@083cae3"
       - SENTRY_TRACES_SAMPLE_RATE: "1.0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
@@ -158,15 +158,8 @@ containers:
       # 2026-06-16 (v0.10.67): upgraded qwen3-30b-a3b-instruct-2507 → qwen3.6-35b-a3b
       # (near-ai backend recovered; the REDPILL_PIN_* below were authenticated
       # against qwen3.6-35b-a3b on 2026-06-12, so this is the correct pairing).
-      # 2026-06-16 (v0.10.72): use the old OpenAI-compatible Tinfoil inference
-      # endpoint directly. The SDK path still times out on router.inf6.tinfoil.sh
-      # attestation discovery from inside the enclave. v0.10.72 keeps startup
-      # health independent from the direct endpoint and probes it only via
-      # /api/health?model=1&fresh=1.
-      - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      - VITA_AGENT_MODEL: "gemma4-31b"
-      - VITA_AGENT_TINFOIL_TRANSPORT: "direct"
-      - VITA_AGENT_TINFOIL_DIRECT_HEALTH_TIMEOUT_S: "20"
+      - VITA_AGENT_MODEL_PROVIDER: "redpill"
+      - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
       - REDPILL_E2EE: "1"                    # client-side ECIES encrypt-to-enclave
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
@@ -178,9 +171,10 @@ containers:
       - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
       - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
       - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
-      # 2026-06-16 rollback target while direct Tinfoil is tested:
-      # - VITA_AGENT_MODEL_PROVIDER: "redpill"
-      # - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
+      # 2026-06-15: Tinfoil gemma4-31b — DISABLED 2026-06-16 (enclave can't reach
+      # *.tinfoil.sh; ConnectTimeout). Re-enable once Tinfoil egress is opened.
+      # - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
+      # - VITA_AGENT_MODEL: "gemma4-31b"
 
       # ── Reference (RedPill attestation requirements) ──────────────────────
       # 2026-06-12. RedPill must remain strict-fail-closed and should only stay
