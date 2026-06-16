@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:v0.10.70@sha256:3d1c9f8f9eb3c5fa887dd77c01f3a5825cd7447e78e231e0d5ecc6f5e79f9205"
+    image: "ghcr.io/vitadao/vita-agent:v0.10.72@sha256:e70c989d71f9eefa9001a5aa01861eb933fa6761f608506cdc1bcad4e839d945"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -60,8 +60,8 @@ containers:
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@ddb6675"
-      - VITA_AGENT_VERSION: "vita-agent@ddb6675"
+      - SENTRY_RELEASE: "vita-agent@6f9c0b7"
+      - VITA_AGENT_VERSION: "vita-agent@6f9c0b7"
       - SENTRY_TRACES_SAMPLE_RATE: "1.0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
@@ -158,12 +158,15 @@ containers:
       # 2026-06-16 (v0.10.67): upgraded qwen3-30b-a3b-instruct-2507 → qwen3.6-35b-a3b
       # (near-ai backend recovered; the REDPILL_PIN_* below were authenticated
       # against qwen3.6-35b-a3b on 2026-06-12, so this is the correct pairing).
-      # 2026-06-16 (v0.10.70): use the old OpenAI-compatible Tinfoil inference
+      # 2026-06-16 (v0.10.72): use the old OpenAI-compatible Tinfoil inference
       # endpoint directly. The SDK path still times out on router.inf6.tinfoil.sh
-      # attestation discovery from inside the enclave.
+      # attestation discovery from inside the enclave. v0.10.72 keeps startup
+      # health independent from the direct endpoint and probes it only via
+      # /api/health?model=1&fresh=1.
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_MODEL: "gemma4-31b"
       - VITA_AGENT_TINFOIL_TRANSPORT: "direct"
+      - VITA_AGENT_TINFOIL_DIRECT_HEALTH_TIMEOUT_S: "20"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
       - REDPILL_E2EE: "1"                    # client-side ECIES encrypt-to-enclave
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
