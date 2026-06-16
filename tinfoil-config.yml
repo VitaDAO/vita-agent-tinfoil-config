@@ -34,7 +34,11 @@ containers:
       # Need/Fill retrieval loop. Capability-gated in the handler: activates
       # ONLY for requests advertising client_capabilities:["need_fill_v1"]
       # (app build with VITE_ENABLE_NEED_FILL), so byte-identical otherwise.
-      - VITA_AGENT_ENABLE_NEED_FILL: "1"
+      # Disabled 2026-06-16: advertising need_fill_v1 (frontend bed9666b) made
+      # EVERY chat wire request_browser_data+StopAtTools onto the agent, whose
+      # need/fill path still 5xxs (llm_upstream_busy / fill-leg). Flip back to
+      # "1" only after the enclave run-termination fix lands + frontend re-tests.
+      - VITA_AGENT_ENABLE_NEED_FILL: "0"
 
       # Production hardening gates
       - STRICT_PROD: "1"
