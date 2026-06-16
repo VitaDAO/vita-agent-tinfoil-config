@@ -73,6 +73,13 @@ git push origin main v0.10.0
 The workflow attests the image, creates a pre-release with the bundle,
 and the Tinfoil container can be launched from the signed tag.
 
+When relaunching with RedPill, pass the secret explicitly — listing
+`REDPILL_API_KEY` under `secrets:` is not always enough:
+
+```bash
+tinfoil container relaunch <container-id> --tag v0.10.x --secret REDPILL_API_KEY
+```
+
 ## Required secrets (set in the Tinfoil dashboard)
 
 | Secret | Used by | Notes |
@@ -84,6 +91,7 @@ and the Tinfoil container can be launched from the signed tag.
 | `AUBRAI_HPKE_PUBLIC_KEY` | aubrai_scientist tool | 32-byte hex pubkey |
 | `X402_WALLET_PRIVATE_KEY` | aubrai_scientist tool | Funded Base mainnet wallet |
 | `SENTRY_DSN` | PHI-safe error monitoring | Optional; enables scrubbed Sentry events |
+| `REDPILL_API_KEY` | RedPill LLM provider | Required when `VITA_AGENT_MODEL_PROVIDER=redpill` |
 
 `X402_WALLET_PRIVATE_KEY` is the highest-value secret — never log, never
 store outside the dashboard's encrypted slot.

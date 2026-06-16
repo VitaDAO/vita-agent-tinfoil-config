@@ -52,15 +52,15 @@ containers:
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"      # Reject plaintext DEK headers
       - VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS: "0"
       - VITA_AGENT_JSON_LOGS: "1"
-      # Off — was a temporary Jun 16 latency probe (v0.10.65).
-      - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
+      # Off — Jun 16 latency probe; disable in prod to reduce boot noise.
+      - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "0"
 
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
       - SENTRY_RELEASE: "vita-agent@474f199"
       - VITA_AGENT_VERSION: "vita-agent@474f199"
-      - SENTRY_TRACES_SAMPLE_RATE: "1.0"
+      - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
       # Supabase JWT verification. User-facing data reads/writes forward the
