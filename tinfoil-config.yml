@@ -18,7 +18,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:39f9b99@sha256:6c4fbb4357dbb855b1abd71546b61671e0d3e3af9edaa66294a47417c773956b"
+    image: "ghcr.io/vitadao/vita-agent:9d1c7304133cd3befad6f382e87cc6635d982d44@sha256:9c611d975815171d31697e0e88fc35a23609744bbabbffa920df1b116bd22844"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -58,8 +58,8 @@ containers:
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@39f9b99"
-      - VITA_AGENT_VERSION: "vita-agent@39f9b99"
+      - SENTRY_RELEASE: "vita-agent@9d1c730"
+      - VITA_AGENT_VERSION: "vita-agent@9d1c730"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
 
@@ -90,10 +90,10 @@ containers:
       # Auto fact extraction (Mem0-style) ON by default; set to "0" to disable
       - VITA_AGENT_AUTO_EXTRACT: "1"
 
-      # Encrypted job runner. Production v1 does not run a durable internal
-      # autorunner; the browser creates a job and immediately triggers
-      # /api/v1/jobs/{id}/run with the user's RLS-scoped Supabase JWT.
-      - VITA_AGENT_JOB_AUTORUN: "0"
+      # Encrypted job runner. Research Radar creates a job, then the browser
+      # polls /api/v1/jobs/{id}; this autorunner claims pending jobs inside the
+      # enclave so the browser does not block on /api/v1/jobs/{id}/run.
+      - VITA_AGENT_JOB_AUTORUN: "1"
 
       # Aubrai routing
       - AUBRAI_MODE: "x402"
