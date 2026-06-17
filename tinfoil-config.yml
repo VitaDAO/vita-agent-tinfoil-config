@@ -52,8 +52,8 @@ containers:
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"      # Reject plaintext DEK headers
       - VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS: "0"
       - VITA_AGENT_JSON_LOGS: "1"
-      # Off — Jun 16 latency probe; disable in prod to reduce boot noise.
-      - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "0"
+      # Temporarily on for the Jun 17 Tinfoil inf6 hairpin retest.
+      - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
 
       # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
       # Tinfoil secret. Keep traces/profiles off by default.
@@ -137,10 +137,10 @@ containers:
       # in 3ms; k2-5 absent from the model list. Other available kimi-class
       # alternatives if k2-6 ever rotates: gemma4-31b, llama3-3-70b,
       # gpt-oss-120b (all returned 200 in the same probe).
-      # RedPill interim — tinfoil/gemma still ConnectTimeout on inf6 (v0.10.78 retest).
-      # v0.10.85: revert z-ai/glm-5.2 → phala/qwen3.6-35b-a3b (proven RedPill path).
-      - VITA_AGENT_MODEL_PROVIDER: "redpill"
-      - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
+      # 2026-06-17 (v0.10.86): retry tinfoil/gemma after Tinfoil fixed
+      # inf6 hairpin routing for router/inference attestation.
+      - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
+      - VITA_AGENT_MODEL: "gemma4-31b"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
       - REDPILL_E2EE: "1"
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
@@ -152,9 +152,9 @@ containers:
       - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
       - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
       - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
-      # June 10 target — enable when Tinfoil fixes inf6 egress:
-      # - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      # - VITA_AGENT_MODEL: "gemma4-31b"
+      # RedPill fallback if Tinfoil inf6 routing regresses again:
+      # - VITA_AGENT_MODEL_PROVIDER: "redpill"
+      # - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
 
     secrets:
       # ── All values are encrypted; only decryptable inside the attested enclave ──
