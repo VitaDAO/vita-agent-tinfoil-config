@@ -11,14 +11,23 @@
 #   5. Deploy the tag as a non-debug Tinfoil container named vita-agent-prod
 
 cvm-version: 0.7.5
-cpus: 8         # Phase 1+3: 4 uvicorn workers, each forking subprocesses per request
-memory: 16384   # 16 GB — initial prod-attested headroom; tune after real capsule/job telemetry
+cpus: 8         # 4 uvicorn workers + per-request forks, sharing the box with llama.cpp
+memory: 65536   # 64 GB — app + 35B MoE GGUF host buffers + KV + embeddings (was 16384)
+gpus: 1         # H200 — claimed by the llama sidecar (runtime: nvidia, gpus: all)
+
+# In-enclave model: the GGUF is provisioned read-only via dm-verity at
+# /tinfoil/mpk/mpk-<root_hash>/, mounted into the llama container. The app
+# (provider=local) reaches it over loopback — no external inference, no hairpin.
+models:
+  - name: "qwen3-6-35b-a3b-claude-4-6-opus-reasoning-distilled-gguf"
+    repo: "hesamation/Qwen3.6-35B-A3B-Claude-4.6-Opus-Reasoning-Distilled-GGUF@21c5c33e749f78d01a12091301509f70d1565562"
+    mpk:  "1d9243855dbb54dcbdb53df4dc9574a45ccffb1a7013744d09fbcdb44eea84b0_111313199104_48023144-2fc9-538b-b7b7-633cf82a145b"
 
 containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:fix-redpill-glm-attestation@sha256:ac24790e33c192a8efba32c0b131a82cb3fd135073dbd23682006577eb10ee71"
+    image: "ghcr.io/vitadao/vita-agent:feat-local-inenclave-model@sha256:fb65c28198373689f6b7cc5f81268a666ad6fa9f9c851e3981306658fe969454"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -139,9 +148,22 @@ containers:
       # gpt-oss-120b (all returned 200 in the same probe).
       # 2026-06-17 (v0.10.86): retry tinfoil/gemma after Tinfoil fixed
       # inf6 hairpin routing for router/inference attestation.
-      - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      - VITA_AGENT_MODEL: "gemma4-31b"
-      - VITA_AGENT_CHAT_TEMPERATURE: "0.2"
+      # 2026-06-18 (v0.11.0): in-enclave cutover. The model now runs as a
+      # llama.cpp sidecar in THIS enclave (provider=local, loopback). Kills the
+      # NAT hairpin permanently — no external inference, PHI stays in the TEE.
+      # Rollback = redeploy v0.10.88 (tinfoil/gemma, gpus:0); RedPill block below.
+      - VITA_AGENT_MODEL_PROVIDER: "local"
+      - VITA_AGENT_MODEL: "qwen-opus"
+      - VITA_AGENT_LOCAL_BASE_URL: "http://localhost:8080/v1"
+      # Thinking-ON qwen3.6 Opus-distill (model-card sampling). Validated 17/17
+      # routing + 0 honesty violations against the real prompt on green.
+      - VITA_AGENT_CHAT_THINKING: "1"
+      - VITA_AGENT_CHAT_TEMPERATURE: "0.6"
+      - VITA_AGENT_CHAT_TOP_P: "0.95"
+      - VITA_AGENT_CHAT_TOP_K: "20"
+      - VITA_AGENT_CHAT_MIN_P: "0"
+      # Reasoning tokens precede the answer; 1200 (thinking-off default) truncated.
+      - VITA_AGENT_CHAT_MAX_TOKENS: "2500"
       - REDPILL_E2EE: "1"
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
       - REDPILL_ATTESTATION_RETRIES: "6"
@@ -184,6 +206,27 @@ containers:
       - AUBRAI_HPKE_PUBLIC_KEY        # 32-byte hex; published by Aubrai
       - X402_WALLET_PRIVATE_KEY       # Base mainnet wallet, funded with USDC.
                                       # HIGHEST-VALUE secret in this enclave.
+
+  # In-enclave model server. Co-located with the app (host netns) so the app
+  # reaches it at localhost:8080. NOT exposed via the shim — internal only.
+  - name: llama
+    image: "ghcr.io/ggml-org/llama.cpp@sha256:aead4f4d77679873a40036c984702c8a9a52ab52275b0702e2fa68b4bc9a5f03"
+    runtime: nvidia
+    gpus: all
+    command:
+      - "-m"
+      - "/tinfoil/mpk/mpk-1d9243855dbb54dcbdb53df4dc9574a45ccffb1a7013744d09fbcdb44eea84b0/Qwen3.6-35B-A3B-Claude-4.6-Opus-Reasoning-Distilled.Q4_K_M.gguf"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      - "-ngl"
+      - "99"
+      - "-c"
+      - "16384"
+      - "--jinja"
+      - "--alias"
+      - "qwen-opus"
 
 shim:
   upstream-port: 8787
