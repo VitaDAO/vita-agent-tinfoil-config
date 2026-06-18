@@ -27,7 +27,7 @@ containers:
   - name: vita-agent
     # Image digest is pinned per release.
     # Update by hand whenever a new vita-agent build lands in GHCR.
-    image: "ghcr.io/vitadao/vita-agent:feat-local-inenclave-model@sha256:fb65c28198373689f6b7cc5f81268a666ad6fa9f9c851e3981306658fe969454"
+    image: "ghcr.io/vitadao/vita-agent:feat-local-inenclave-model@sha256:40e15791106a8f84976a3b92909a7e03e8b464820ec538919874bf18570f0dd5"
     registry:
       username: DobrinAlexandru
       # Per-service secret name so vita-agent and aubrai-server can rotate
@@ -157,13 +157,14 @@ containers:
       - VITA_AGENT_LOCAL_BASE_URL: "http://localhost:8080/v1"
       # Thinking-ON qwen3.6 Opus-distill (model-card sampling). Validated 17/17
       # routing + 0 honesty violations against the real prompt on green.
-      - VITA_AGENT_CHAT_THINKING: "1"
+      - VITA_AGENT_CHAT_THINKING: "auto"   # adaptive: think on substantive turns, off for chit-chat
       - VITA_AGENT_CHAT_TEMPERATURE: "0.6"
       - VITA_AGENT_CHAT_TOP_P: "0.95"
       - VITA_AGENT_CHAT_TOP_K: "20"
       - VITA_AGENT_CHAT_MIN_P: "0"
       # Reasoning tokens precede the answer; 1200 (thinking-off default) truncated.
-      - VITA_AGENT_CHAT_MAX_TOKENS: "2500"
+      - VITA_AGENT_CHAT_MAX_TOKENS: "2500"      # cap when thinking ON
+      - VITA_AGENT_CHAT_MAX_TOKENS_LIGHT: "1300"  # cap when thinking OFF (trivial turns)
       - REDPILL_E2EE: "1"
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
       - REDPILL_ATTESTATION_RETRIES: "6"
