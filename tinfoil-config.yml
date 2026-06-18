@@ -18,7 +18,7 @@ models:
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:main@sha256:d9b0117c082ab78883ba977658111a88661b2ab6ae512a73d680d7ef420abe3a"
+    image: "ghcr.io/vitadao/vita-agent:main@sha256:47c0af78b3e530d6ba3c0dd4b4b6ad6fc6001e41f2fb1d291b1a655cbc520e52"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -36,8 +36,8 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@926a3ba"
-      - VITA_AGENT_VERSION: "vita-agent@926a3ba"
+      - SENTRY_RELEASE: "vita-agent@ca84875"
+      - VITA_AGENT_VERSION: "vita-agent@ca84875"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
