@@ -13,7 +13,7 @@
 
 cvm-version: 0.10.4
 cpus: 16
-memory: 98304
+memory: 65536
 gpus: 1
 
 # vLLM/flashinfer may fetch CUDA cubins at boot.
