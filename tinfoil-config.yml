@@ -33,7 +33,7 @@ models:
 containers:
   # ── APP — UNCHANGED from v0.11.4 (only model engine is changing) ──
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:main@sha256:6f4dac62641def1ae83c6b7be41bf5040bdbd4ec86b2ca34f103bb2fe9ecf049"
+    image: "ghcr.io/vitadao/vita-agent:main@sha256:d9b0117c082ab78883ba977658111a88661b2ab6ae512a73d680d7ef420abe3a"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -51,8 +51,8 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@41d2e9a"
-      - VITA_AGENT_VERSION: "vita-agent@41d2e9a"
+      - SENTRY_RELEASE: "vita-agent@926a3ba"
+      - VITA_AGENT_VERSION: "vita-agent@926a3ba"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
