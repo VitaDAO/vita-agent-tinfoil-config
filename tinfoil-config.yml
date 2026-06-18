@@ -1,29 +1,15 @@
 # Tinfoil Container Configuration — vita-agent production
-# PROPOSED: bf16 vLLM cutover from llama.cpp. Swaps ONLY the model engine.
-# App container, shim, and all secrets are UNCHANGED from v0.11.4.
-#
-# CHANGES vs v0.11.4:
-#   - cvm-version 0.7.5 -> 0.10.4   (required for the vLLM container pattern)   [RISK: verify app+capsule]
-#   - cpus 8 -> 16, memory 65536 -> 98304                                       (vLLM + app + forks)
-#   - models: GGUF entry -> bf16 entry (the UI-wrapped mpk)
-#   - containers: `llama` (llama.cpp) -> `vllm` (vllm-openai)
-#   - added networks.nvidia egress (flashinfer cubins)
-#
-# DEPLOY: push a vX.Y.Z tag -> tinfoil-build.yml attests -> tinfoil container create --replace vita-agent-prod
+# v0.12.2: GGUF/llama.cpp -> vLLM (bf16). MINIMAL delta from working v0.11.4.
+# Keeps cvm 0.7.5 (proven — gemma4 ran vllm-openai here), no networks/tmpfs/env
+# (0.7.5 schema), tool-call-parser qwen3_coder (Qwen3.5 family). App + shim + secrets
+# UNCHANGED. Deploy with ALL 10 --secret flags.
 
-cvm-version: 0.10.4
-cpus: 16
+cvm-version: 0.7.5
+cpus: 8
 memory: 65536
 gpus: 1
 
-# vLLM/flashinfer may fetch CUDA cubins at boot.
-networks:
-  nvidia:
-    egress: allowlist
-    allow:
-      - edge.urm.nvidia.com
-
-# In-enclave model: bf16 safetensors (same distill), UI-wrapped via dm-verity,
+# In-enclave model: bf16 safetensors (same distill), UI-wrapped dm-verity mpk,
 # served by vLLM over loopback (provider=local). No external inference, no hairpin.
 models:
   - name: "qwen3-6-35b-a3b-claude-4-6-opus-reasoning-distilled"
@@ -31,7 +17,6 @@ models:
     mpk:  "0bcc0d07dd37388a5b2d407ef2f0aa94c57f15b99deba88d44a3028aa7e4bef0_71923912704_22865403-c61b-5cdd-82fe-4f40382a692b"
 
 containers:
-  # ── APP — UNCHANGED from v0.11.4 (only model engine is changing) ──
   - name: vita-agent
     image: "ghcr.io/vitadao/vita-agent:main@sha256:d9b0117c082ab78883ba977658111a88661b2ab6ae512a73d680d7ef420abe3a"
     registry:
@@ -66,7 +51,6 @@ containers:
       - AUBRAI_MODE: "x402"
       - AUBRAI_DEBUG: "0"
       - AUBRAI_FAST: "0"
-      # Model: in-enclave, now served by vLLM (OpenAI-compatible) on loopback. Unchanged contract.
       - VITA_AGENT_MODEL_PROVIDER: "local"
       - VITA_AGENT_MODEL: "qwen-opus"
       - VITA_AGENT_LOCAL_BASE_URL: "http://localhost:8080/v1"
@@ -98,15 +82,14 @@ containers:
       - AUBRAI_HPKE_PUBLIC_KEY
       - X402_WALLET_PRIVATE_KEY
 
-  # ── MODEL SERVER — vLLM (REPLACES the llama.cpp `llama` block) ──
-  # Internal-only (loopback). NOT exposed via the shim. NO secrets in this container.
+  # In-enclave model server — vLLM (REPLACES the llama.cpp `llama` block).
+  # Only cvm-0.7.5-supported fields. Internal-only (127.0.0.1). No secrets here.
   - name: vllm
     image: "vllm/vllm-openai:v0.22.0@sha256:0fec7ec5f3e6bc168e54899935fb0557da908a4832a1dbc88e2debcf2f889416"
     runtime: nvidia
     gpus: all
+    ipc: host
     restart: always
-    env:
-      - PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
     command:
       - "--model"
       - "/tinfoil/mpk/mpk-0bcc0d07dd37388a5b2d407ef2f0aa94c57f15b99deba88d44a3028aa7e4bef0"
@@ -126,7 +109,7 @@ containers:
       - "--enable-prefix-caching"
       - "--enable-auto-tool-choice"
       - "--tool-call-parser"
-      - "hermes"
+      - "qwen3_coder"
       - "--reasoning-parser"
       - "qwen3"
       - "--scheduling-policy"
@@ -135,17 +118,12 @@ containers:
       - "127.0.0.1"
       - "--port"
       - "8080"
-    tmpfs:
-      /tmp: size=512m,mode=1777,exec
-      /root: size=2g,mode=0700,exec
-      /usr/local/lib/python3.12/dist-packages/flashinfer_cubin/cubins: size=2g,mode=1777,exec
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
       interval: 30s
       timeout: 5s
-      start_period: 30m
+      start_period: 60m
 
-# ── SHIM — UNCHANGED from v0.11.4 (fronts the APP, not vLLM) ──
 shim:
   upstream-port: 8787
   paths:
