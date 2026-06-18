@@ -1,166 +1,80 @@
 # Tinfoil Container Configuration — vita-agent production
+# PROPOSED: bf16 vLLM cutover from llama.cpp. Swaps ONLY the model engine.
+# App container, shim, and all secrets are UNCHANGED from v0.11.4.
 #
-# PUBLIC REPO — this file is the attestation anchor.
-# Users verify the running enclave against the SHA256 digest pinned below.
+# CHANGES vs v0.11.4:
+#   - cvm-version 0.7.5 -> 0.10.4   (required for the vLLM container pattern)   [RISK: verify app+capsule]
+#   - cpus 8 -> 16, memory 65536 -> 98304                                       (vLLM + app + forks)
+#   - models: GGUF entry -> bf16 entry (the UI-wrapped mpk)
+#   - containers: `llama` (llama.cpp) -> `vllm` (vllm-openai)
+#   - added networks.nvidia egress (flashinfer cubins)
 #
-# DEPLOY:
-#   1. Source code lives in VitaDAO/vita-agent
-#   2. That repo's CI builds + pushes the image to GHCR
-#   3. Copy the new digest below + bump version
-#   4. Push a vX.Y.Z tag here → tinfoil-build.yml attests + creates pre-release
-#   5. Deploy the tag as a non-debug Tinfoil container named vita-agent-prod
+# DEPLOY: push a vX.Y.Z tag -> tinfoil-build.yml attests -> tinfoil container create --replace vita-agent-prod
 
-cvm-version: 0.7.5
-cpus: 8         # 4 uvicorn workers + per-request forks, sharing the box with llama.cpp
-memory: 65536   # 64 GB — app + 35B MoE GGUF host buffers + KV + embeddings (was 16384)
-gpus: 1         # H200 — claimed by the llama sidecar (runtime: nvidia, gpus: all)
+cvm-version: 0.10.4
+cpus: 16
+memory: 98304
+gpus: 1
 
-# In-enclave model: the GGUF is provisioned read-only via dm-verity at
-# /tinfoil/mpk/mpk-<root_hash>/, mounted into the llama container. The app
-# (provider=local) reaches it over loopback — no external inference, no hairpin.
+# vLLM/flashinfer may fetch CUDA cubins at boot.
+networks:
+  nvidia:
+    egress: allowlist
+    allow:
+      - edge.urm.nvidia.com
+
+# In-enclave model: bf16 safetensors (same distill), UI-wrapped via dm-verity,
+# served by vLLM over loopback (provider=local). No external inference, no hairpin.
 models:
-  - name: "qwen3-6-35b-a3b-claude-4-6-opus-reasoning-distilled-gguf"
-    repo: "hesamation/Qwen3.6-35B-A3B-Claude-4.6-Opus-Reasoning-Distilled-GGUF@21c5c33e749f78d01a12091301509f70d1565562"
-    mpk:  "1d9243855dbb54dcbdb53df4dc9574a45ccffb1a7013744d09fbcdb44eea84b0_111313199104_48023144-2fc9-538b-b7b7-633cf82a145b"
+  - name: "qwen3-6-35b-a3b-claude-4-6-opus-reasoning-distilled"
+    repo: "hesamation/Qwen3.6-35B-A3B-Claude-4.6-Opus-Reasoning-Distilled@1b93f96111b5f32711f7d48de619e5c671331283"
+    mpk:  "0bcc0d07dd37388a5b2d407ef2f0aa94c57f15b99deba88d44a3028aa7e4bef0_71923912704_22865403-c61b-5cdd-82fe-4f40382a692b"
 
 containers:
+  # ── APP — UNCHANGED from v0.11.4 (only model engine is changing) ──
   - name: vita-agent
-    # Image digest is pinned per release.
-    # Update by hand whenever a new vita-agent build lands in GHCR.
     image: "ghcr.io/vitadao/vita-agent:main@sha256:6f4dac62641def1ae83c6b7be41bf5040bdbd4ec86b2ca34f103bb2fe9ecf049"
     registry:
       username: DobrinAlexandru
-      # Per-service secret name so vita-agent and aubrai-server can rotate
-      # independently even if Tinfoil shares the secret namespace across containers.
       password_secret: VITA_AGENT_GHCR_TOKEN
-
     env:
-      # Production non-debug private-AI runtime. Staging points here first
-      # to prove attestation before the app production cutover.
       - VITA_AGENT_PORT: "8787"
       - STORAGE_BACKEND: "supabase"
-
-      # Need/Fill retrieval loop. Capability-gated in the handler: activates
-      # ONLY for requests advertising client_capabilities:["need_fill_v1"]
-      # (app build with VITE_ENABLE_NEED_FILL), so byte-identical otherwise.
-      # Disabled 2026-06-16: advertising need_fill_v1 (frontend bed9666b) made
-      # EVERY chat wire request_browser_data+StopAtTools onto the agent, whose
-      # need/fill path still 5xxs (llm_upstream_busy / fill-leg). Flip back to
-      # "1" only after the enclave run-termination fix lands + frontend re-tests.
       - VITA_AGENT_ENABLE_NEED_FILL: "0"
-
-      # Production hardening gates
       - STRICT_PROD: "1"
-      # Keep legacy no-AAD decrypt fallback enabled while staging validates
-      # existing encrypted rows. New writes remain AAD-bound in app/agent code;
-      # flip to "1" only after the legacy row migration/backfill passes.
       - AAD_REQUIRED: "0"
       - VITA_ROUTING_MODE: "direct"
       - OPENAI_AGENTS_DISABLE_TRACING: "1"
       - VITA_AGENT_ENCLAVE_URL: "https://vita-agent-prod.vitality-now.containers.tinfoil.dev/"
-      - VITA_AGENT_REQUIRE_SEALED_DEK: "1"      # Reject plaintext DEK headers
+      - VITA_AGENT_REQUIRE_SEALED_DEK: "1"
       - VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS: "0"
       - VITA_AGENT_JSON_LOGS: "1"
-      # Temporarily on for the Jun 17 Tinfoil inf6 hairpin retest.
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
-
-      # PHI-safe Sentry is disabled unless SENTRY_DSN is configured as a
-      # Tinfoil secret. Keep traces/profiles off by default.
       - SENTRY_ENVIRONMENT: "production"
       - SENTRY_RELEASE: "vita-agent@41d2e9a"
       - VITA_AGENT_VERSION: "vita-agent@41d2e9a"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
-
-      # Supabase JWT verification. User-facing data reads/writes forward the
-      # user's Supabase JWT. Control-plane replay/audit/cost rows use a
-      # Supabase Auth machine user with app_metadata.vita_agent_internal=true,
-      # so no Supabase signing key or service-role key is required.
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
       - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
-      # Note: no VITA_AGENT_ATTESTATION_MODE — attestation is served by
-      # the cvmimage shim at /.well-known/tinfoil-attestation, not by
-      # this workload. Removed in vita-agent v0.8.17.
-
-      # Per-user rate limiting (token bucket)
       - VITA_AGENT_RATE_LIMIT_RPM: "60"
-      - VITA_AGENT_MAX_REQUEST_BYTES: "2097152"  # 2MB
-
-
-      # Memory pipeline (bge-base default; downgrade to bge-small only if streaming
-      # latency is a problem. Adaptive chunk size + adaptive K are always on.)
+      - VITA_AGENT_MAX_REQUEST_BYTES: "2097152"
       - VITA_AGENT_EMBED_MODEL: "BAAI/bge-base-en-v1.5"
-
-      # Persona doc auto-refresh cadence (every Nth write_memory)
       - VITA_AGENT_PERSONA_REFRESH_EVERY: "10"
-
-      # Auto fact extraction (Mem0-style) ON by default; set to "0" to disable
       - VITA_AGENT_AUTO_EXTRACT: "1"
-
-      # Encrypted job runner. Research Radar creates a job, then the browser
-      # polls /api/v1/jobs/{id}; this autorunner claims pending jobs inside the
-      # enclave so the browser does not block on /api/v1/jobs/{id}/run.
       - VITA_AGENT_JOB_AUTORUN: "1"
-
-      # Aubrai routing
       - AUBRAI_MODE: "x402"
-      # AUBRAI_DEBUG=0 forces the HPKE encrypted x402 Aubrai endpoint.
       - AUBRAI_DEBUG: "0"
       - AUBRAI_FAST: "0"
-
-      # LLM provider — Tinfoil Inference is the only allowed provider.
-      # Available models (2026-04-22): glm-5-1, gpt-oss-120b, kimi-k2-6,
-      # llama3-3-70b, gemma4-31b, qwen3-vl-30b, voxtral-small-24b.
-      #
-      # 2026-04-22: switched glm-5-1 → kimi-k2-6. Local bench showed
-      # kimi was 2-4.5x faster than glm-5-1 with much steadier latency.
-      #
-      # 2026-04-22 (v0.8.8): switched kimi-k2-6 → gemma4-31b. The
-      # routing test (scripts/test_aubrai_routing.py, 17 prompts mixing
-      # trivial / user-data / explicit-ask / longevity-domain / ambiguous
-      # biology) showed kimi-k2-6 unreliably called call_aubrai_scientist
-      # for ambiguous biology terms (FOXO3, alpha-ketoglutarate) and even
-      # fabricated "Aubrai found..." attributions when it skipped the
-      # call. gemma4-31b scored 17/17 with no forced classifier — it
-      # follows the system-prompt routing rules naturally. Slightly
-      # slower per token (5-30s for tool-using turns vs kimi's 5-22s)
-      # but the reliability + honesty gain outweighs the latency.
-      #
-      # 2026-04-23 (v0.8.14): reverted gemma4-31b → kimi-k2-6. Trading
-      # routing reliability for raw speed during the perf push. Watch
-      # for the regression: hallucinated "Aubrai found..." attributions
-      # and skipped tool calls on ambiguous biology terms. If those
-      # come back, rollback to gemma4-31b is one line.
-      #
-      # 2026-04-23 (v0.8.15): kimi-k2-6 → kimi-k2-5. v0.8.14 pinned the
-      # wrong K2 SKU; user explicitly asked for k2-5. Tinfoil exposes
-      # both — `curl -H "Authorization: Bearer $TINFOIL_API_KEY"
-      # https://inference.tinfoil.sh/v1/models` lists both ids.
-      #
-      # 2026-04-28: kimi-k2-5 → kimi-k2-6. Tinfoil rotated the k2-5 SKU
-      # (no longer in /v1/models); requests return 503 "engine overloaded"
-      # which surfaces to the browser as InternalServerError on chat.
-      # Verified via scripts/test_tinfoil_models.sh — k2-6 returns 200
-      # in 3ms; k2-5 absent from the model list. Other available kimi-class
-      # alternatives if k2-6 ever rotates: gemma4-31b, llama3-3-70b,
-      # gpt-oss-120b (all returned 200 in the same probe).
-      # 2026-06-17 (v0.10.86): retry tinfoil/gemma after Tinfoil fixed
-      # inf6 hairpin routing for router/inference attestation.
-      # 2026-06-18 (v0.11.0): in-enclave cutover. The model now runs as a
-      # llama.cpp sidecar in THIS enclave (provider=local, loopback). Kills the
-      # NAT hairpin permanently — no external inference, PHI stays in the TEE.
-      # Rollback = redeploy v0.10.88 (tinfoil/gemma, gpus:0); RedPill block below.
+      # Model: in-enclave, now served by vLLM (OpenAI-compatible) on loopback. Unchanged contract.
       - VITA_AGENT_MODEL_PROVIDER: "local"
       - VITA_AGENT_MODEL: "qwen-opus"
       - VITA_AGENT_LOCAL_BASE_URL: "http://localhost:8080/v1"
-      # Thinking-ON qwen3.6 Opus-distill (model-card sampling). Validated 17/17
-      # routing + 0 honesty violations against the real prompt on green.
       - VITA_AGENT_CHAT_THINKING: "1"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.6"
       - VITA_AGENT_CHAT_TOP_P: "0.95"
       - VITA_AGENT_CHAT_TOP_K: "20"
       - VITA_AGENT_CHAT_MIN_P: "0"
-      # Reasoning tokens precede the answer; 1200 (thinking-off default) truncated.
       - VITA_AGENT_CHAT_MAX_TOKENS: "2500"
       - REDPILL_E2EE: "1"
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
@@ -172,72 +86,72 @@ containers:
       - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
       - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
       - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
-      # RedPill fallback if Tinfoil inf6 routing regresses again:
-      # - VITA_AGENT_MODEL_PROVIDER: "redpill"
-      # - VITA_AGENT_MODEL: "phala/qwen3.6-35b-a3b"
-
     secrets:
-      # ── All values are encrypted; only decryptable inside the attested enclave ──
-      # Set each in the Tinfoil Dashboard > Secrets BEFORE first deploy.
-
-      # GHCR pull credentials — per-service name so vita-agent and aubrai-server
-      # can rotate independently even if Tinfoil shares the secret namespace.
       - VITA_AGENT_GHCR_TOKEN
-
-      # Tinfoil Inference (LLM) auth — keep for swap-back to gemma4-31b
       - TINFOIL_API_KEY
-
-      # RedPill/Phala confidential inference (active interim LLM)
       - REDPILL_API_KEY
-
-      # Sentry error monitoring. DSN is a secret in Tinfoil, never committed.
       - SENTRY_DSN
-
-      # Supabase. User JWTs are forwarded for user-scoped data; the machine
-      # user token is only for internal replay/audit/cost RLS policies.
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
       - SUPABASE_INTERNAL_AUTH_EMAIL
       - SUPABASE_INTERNAL_AUTH_PASSWORD
+      - AUBRAI_HPKE_PUBLIC_KEY
+      - X402_WALLET_PRIVATE_KEY
 
-      # Aubrai scientist tool — HPKE seal target + x402 wallet
-      - AUBRAI_HPKE_PUBLIC_KEY        # 32-byte hex; published by Aubrai
-      - X402_WALLET_PRIVATE_KEY       # Base mainnet wallet, funded with USDC.
-                                      # HIGHEST-VALUE secret in this enclave.
-
-  # In-enclave model server. Co-located with the app (host netns) so the app
-  # reaches it at localhost:8080. NOT exposed via the shim — internal only.
-  - name: llama
-    image: "ghcr.io/ggml-org/llama.cpp@sha256:aead4f4d77679873a40036c984702c8a9a52ab52275b0702e2fa68b4bc9a5f03"
+  # ── MODEL SERVER — vLLM (REPLACES the llama.cpp `llama` block) ──
+  # Internal-only (loopback). NOT exposed via the shim. NO secrets in this container.
+  - name: vllm
+    image: "vllm/vllm-openai:v0.22.0@sha256:0fec7ec5f3e6bc168e54899935fb0557da908a4832a1dbc88e2debcf2f889416"
     runtime: nvidia
     gpus: all
+    restart: always
+    env:
+      - PYTORCH_CUDA_ALLOC_CONF: "expandable_segments:True"
     command:
-      - "-m"
-      - "/tinfoil/mpk/mpk-1d9243855dbb54dcbdb53df4dc9574a45ccffb1a7013744d09fbcdb44eea84b0/Qwen3.6-35B-A3B-Claude-4.6-Opus-Reasoning-Distilled.Q4_K_M.gguf"
+      - "--model"
+      - "/tinfoil/mpk/mpk-0bcc0d07dd37388a5b2d407ef2f0aa94c57f15b99deba88d44a3028aa7e4bef0"
+      - "--served-model-name"
+      - "qwen-opus"
+      - "--language-model-only"
+      - "--dtype"
+      - "bfloat16"
+      - "--kv-cache-dtype"
+      - "fp8"
+      - "--max-model-len"
+      - "32768"
+      - "--max-num-seqs"
+      - "32"
+      - "--gpu-memory-utilization"
+      - "0.90"
+      - "--enable-prefix-caching"
+      - "--enable-auto-tool-choice"
+      - "--tool-call-parser"
+      - "hermes"
+      - "--reasoning-parser"
+      - "qwen3"
+      - "--scheduling-policy"
+      - "priority"
       - "--host"
-      - "0.0.0.0"
+      - "127.0.0.1"
       - "--port"
       - "8080"
-      - "-ngl"
-      - "99"
-      - "-c"
-      - "16384"
-      - "--jinja"
-      - "--alias"
-      - "qwen-opus"
+    tmpfs:
+      /tmp: size=512m,mode=1777,exec
+      /root: size=2g,mode=0700,exec
+      /usr/local/lib/python3.12/dist-packages/flashinfer_cubin/cubins: size=2g,mode=1777,exec
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30m
 
+# ── SHIM — UNCHANGED from v0.11.4 (fronts the APP, not vLLM) ──
 shim:
   upstream-port: 8787
   paths:
-    # Bootstrapping (no auth)
     - /api/health
     - /metrics
     - /.well-known/enclave-pubkey
-    # Note: /.well-known/tinfoil-attestation is served by the shim
-    # itself (cvmimage), so we don't list it here. The vita-agent
-    # workload doesn't publish an attestation route as of v0.8.17.
-
-    # v1 capsule transport (sealed envelope path).
     - /api/v1/capsule
     - /api/v1/jobs
     - /api/v1/jobs/*
