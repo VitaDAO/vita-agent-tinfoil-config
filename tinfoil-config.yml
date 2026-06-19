@@ -1,24 +1,14 @@
-# Tinfoil Container Configuration — vita-agent production
-# v0.12.2: GGUF/llama.cpp -> vLLM (bf16). MINIMAL delta from working v0.11.4.
-# Keeps cvm 0.7.5 (proven — gemma4 ran vllm-openai here), no networks/tmpfs/env
-# (0.7.5 schema), tool-call-parser qwen3_coder (Qwen3.5 family). App + shim + secrets
-# UNCHANGED. Deploy with ALL 10 --secret flags.
+# Tinfoil Container Configuration — vita-agent-prod (SLIM, app-only / model split)
+# App calls the model over attested HTTPS to vita-model-prod (provider=tinfoil,
+# pinned to VitaDAO/vita-agent-model-test-tinfoil-config). No GPU, no vLLM here.
 
 cvm-version: 0.7.5
 cpus: 8
 memory: 65536
-gpus: 1
-
-# In-enclave model: bf16 safetensors (same distill), UI-wrapped dm-verity mpk,
-# served by vLLM over loopback (provider=local). No external inference, no hairpin.
-models:
-  - name: "qwen3-6-35b-a3b-claude-4-6-opus-reasoning-distilled"
-    repo: "hesamation/Qwen3.6-35B-A3B-Claude-4.6-Opus-Reasoning-Distilled@1b93f96111b5f32711f7d48de619e5c671331283"
-    mpk:  "0bcc0d07dd37388a5b2d407ef2f0aa94c57f15b99deba88d44a3028aa7e4bef0_71923912704_22865403-c61b-5cdd-82fe-4f40382a692b"
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:main@sha256:47c0af78b3e530d6ba3c0dd4b4b6ad6fc6001e41f2fb1d291b1a655cbc520e52"
+    image: "ghcr.io/vitadao/vita-agent:main@sha256:eb8fc2bbb148380ca75320679ee81f04e64413eb4423b0b671b5153261fe86a8"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -36,8 +26,8 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@ca84875"
-      - VITA_AGENT_VERSION: "vita-agent@ca84875"
+      - SENTRY_RELEASE: "vita-agent@156c608"
+      - VITA_AGENT_VERSION: "vita-agent@156c608"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
@@ -51,9 +41,11 @@ containers:
       - AUBRAI_MODE: "x402"
       - AUBRAI_DEBUG: "0"
       - AUBRAI_FAST: "0"
-      - VITA_AGENT_MODEL_PROVIDER: "local"
+      - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
+      - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
+      - VITA_AGENT_TINFOIL_ENCLAVE: "vita-model-prod.vitality-now.containers.tinfoil.dev"
+      - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-test-tinfoil-config"
       - VITA_AGENT_MODEL: "qwen-opus"
-      - VITA_AGENT_LOCAL_BASE_URL: "http://localhost:8080/v1"
       - VITA_AGENT_CHAT_THINKING: "1"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.6"
       - VITA_AGENT_CHAT_TOP_P: "0.95"
@@ -81,48 +73,6 @@ containers:
       - SUPABASE_INTERNAL_AUTH_PASSWORD
       - AUBRAI_HPKE_PUBLIC_KEY
       - X402_WALLET_PRIVATE_KEY
-
-  # In-enclave model server — vLLM (REPLACES the llama.cpp `llama` block).
-  # Only cvm-0.7.5-supported fields. Internal-only (127.0.0.1). No secrets here.
-  - name: vllm
-    image: "vllm/vllm-openai:v0.22.0@sha256:0fec7ec5f3e6bc168e54899935fb0557da908a4832a1dbc88e2debcf2f889416"
-    runtime: nvidia
-    gpus: all
-    ipc: host
-    restart: always
-    command:
-      - "--model"
-      - "/tinfoil/mpk/mpk-0bcc0d07dd37388a5b2d407ef2f0aa94c57f15b99deba88d44a3028aa7e4bef0"
-      - "--served-model-name"
-      - "qwen-opus"
-      - "--language-model-only"
-      - "--dtype"
-      - "bfloat16"
-      - "--kv-cache-dtype"
-      - "fp8"
-      - "--max-model-len"
-      - "32768"
-      - "--max-num-seqs"
-      - "32"
-      - "--gpu-memory-utilization"
-      - "0.90"
-      - "--enable-prefix-caching"
-      - "--enable-auto-tool-choice"
-      - "--tool-call-parser"
-      - "qwen3_coder"
-      - "--reasoning-parser"
-      - "qwen3"
-      - "--scheduling-policy"
-      - "priority"
-      - "--host"
-      - "127.0.0.1"
-      - "--port"
-      - "8080"
-    healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 5s
-      start_period: 60m
 
 shim:
   upstream-port: 8787
