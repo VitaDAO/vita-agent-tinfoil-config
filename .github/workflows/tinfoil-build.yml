@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
-      - uses: tinfoilsh/pri-build-action@e9967c4a2dd60bacc7cce9e4315c5ebcd46118e9  # v0.9.2
+      - uses: tinfoilsh/pri-build-action@5d450a7f30904866efc401e24484b935b7ed52dd  # v0.6.1 (matches cvm 0.7.5; v0.9.2 computed a measurement the CVM doesn't boot to → atc mismatch)
         with:
           config-file: ${{ github.workspace }}/tinfoil-config.yml
           github-token: ${{ secrets.GITHUB_TOKEN }}
