@@ -8,7 +8,7 @@ memory: 65536
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:main@sha256:4b5c63efa0d0408090a765f65cdeed18e3238c0bf48233aaa089ab6662d249a0"
+    image: "ghcr.io/vitadao/vita-agent:main@sha256:a08654328ea628dabb2951f999f4f8064b481a797f901fd0169afa1f6102c5f7"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -19,6 +19,7 @@ containers:
       - STRICT_PROD: "1"
       - AAD_REQUIRED: "0"
       - VITA_ROUTING_MODE: "direct"
+      - VITA_AGENT_STREAMING: "0"
       - OPENAI_AGENTS_DISABLE_TRACING: "1"
       - VITA_AGENT_ENCLAVE_URL: "https://vita-agent-prod.vitality-now.containers.tinfoil.dev/"
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"
@@ -26,8 +27,8 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@f915e69"
-      - VITA_AGENT_VERSION: "vita-agent@f915e69"
+      - SENTRY_RELEASE: "vita-agent@cf837dd0"
+      - VITA_AGENT_VERSION: "vita-agent@cf837dd0"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
@@ -82,5 +83,6 @@ shim:
     - /metrics
     - /.well-known/enclave-pubkey
     - /api/v1/capsule
+    - /api/v1/capsule/stream
     - /api/v1/jobs
     - /api/v1/jobs/*
