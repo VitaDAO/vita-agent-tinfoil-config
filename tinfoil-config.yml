@@ -31,8 +31,6 @@ containers:
       - VITA_AGENT_VERSION: "vita-agent@c0b34602"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
-      # TEMP: capture chat traces for the latency breakdown read; revert to remove
-      - VITA_AGENT_FORCE_TRACE_CAPSULE: "1"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
       - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
       - VITA_AGENT_RATE_LIMIT_RPM: "60"
