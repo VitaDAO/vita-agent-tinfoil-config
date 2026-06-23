@@ -8,7 +8,7 @@ memory: 65536
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:main@sha256:0ce522fd297a653a8688446524bcdee33e320fd4d3a365018db85389b64bb14a"
+    image: "ghcr.io/vitadao/vita-agent:main@sha256:d892ea1bc7ec4751a9c9912f9206ca6bb72e1c0c96f685be92f2a5253bada771"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -27,8 +27,8 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@8c332459"
-      - VITA_AGENT_VERSION: "vita-agent@8c332459"
+      - SENTRY_RELEASE: "vita-agent@c0b34602"
+      - VITA_AGENT_VERSION: "vita-agent@c0b34602"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       # TEMP: capture chat traces for the latency breakdown read; revert to remove
