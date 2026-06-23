@@ -8,7 +8,7 @@ memory: 65536
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:main@sha256:967d870553879381544342a7dc5d19e6e96ad804222d1879fda9eeea2d95cdc4"
+    image: "ghcr.io/vitadao/vita-agent:main@sha256:80246104c5a5ff9cbcc2e23365fed0e98f770d85ca540d6d0eec77d07efc070d"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -27,10 +27,12 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@1c58c30f"
-      - VITA_AGENT_VERSION: "vita-agent@1c58c30f"
+      - SENTRY_RELEASE: "vita-agent@ee4072be"
+      - VITA_AGENT_VERSION: "vita-agent@ee4072be"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
+      # TEMP: capture chat traces for the latency breakdown read; revert to remove
+      - VITA_AGENT_FORCE_TRACE_CAPSULE: "1"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
       - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
       - VITA_AGENT_RATE_LIMIT_RPM: "60"
