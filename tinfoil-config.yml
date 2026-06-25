@@ -20,6 +20,13 @@ containers:
       - AAD_REQUIRED: "0"
       - VITA_ROUTING_MODE: "direct"
       - VITA_AGENT_STREAMING: "1"
+      # P3-deploy-flags — audit-feature flags pinned in committed config (not just
+      # the ephemeral enclave Variables layer), so a fresh `container create` can
+      # never silently disable the safety/recall channels.
+      - VITA_AGENT_PINNED_SAFETY: "1"
+      - VITA_AGENT_EXACT_MATCH: "1"
+      - VITA_AGENT_INPUT_FILTER: "1"
+      - VITA_AGENT_TOOLCALL_SALVAGE: "1"
       - OPENAI_AGENTS_DISABLE_TRACING: "1"
       - VITA_AGENT_ENCLAVE_URL: "https://vita-agent-prod.vitality-now.containers.tinfoil.dev/"
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"
