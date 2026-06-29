@@ -8,12 +8,13 @@ memory: 65536
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:76dd45c0e4384bd3ca032408f9a68751256c0c1a@sha256:6f538630931a6c6b85a2c9107be631da6f3cacd75a2c3d0232cac2fbc38c9856"
+    image: "ghcr.io/vitadao/vita-agent:ad5772fd5d6590869db73fa04d4fc326a7c83787@sha256:69fba0539f7d41a60433f398d2a45483d76f84587a64a7d9e2f62153f10e1403"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
     env:
       - VITA_AGENT_PORT: "8787"
+      - VITA_AGENT_MODEL_FALLBACK: "tinfoil"
       - STORAGE_BACKEND: "supabase"
       - VITA_AGENT_ENABLE_NEED_FILL: "1"
       - STRICT_PROD: "1"
