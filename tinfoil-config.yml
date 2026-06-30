@@ -37,7 +37,7 @@ containers:
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "production"
       - SENTRY_RELEASE: "vita-agent@76dd45c"
-      - VITA_AGENT_VERSION: "vita-agent@2fa92f5"
+      - VITA_AGENT_VERSION: "vita-agent@3436c02"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
