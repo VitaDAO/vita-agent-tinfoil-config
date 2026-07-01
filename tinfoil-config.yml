@@ -60,7 +60,7 @@ containers:
       - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-test-tinfoil-config"
       - VITA_AGENT_MODEL: "qwen-opus"
       - VITA_AGENT_HISTORY_TOKEN_BUDGET: "131072"
-      - VITA_AGENT_CHAT_THINKING: "1"
+      - VITA_AGENT_CHAT_THINKING: "auto"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.6"
       - VITA_AGENT_CHAT_TOP_P: "0.95"
       - VITA_AGENT_CHAT_TOP_K: "20"
