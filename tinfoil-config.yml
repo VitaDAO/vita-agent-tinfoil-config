@@ -41,7 +41,7 @@ containers:
       - VITA_AGENT_REPLAY_REASONING: "1"
       - VITA_AGENT_PARALLEL_TOOLS: "1"
       - VITA_AGENT_STATIC_PREFIX: "1"
-      - SENTRY_TRACES_SAMPLE_RATE: "0.1"
+      - SENTRY_TRACES_SAMPLE_RATE: "1.0"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
       - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
