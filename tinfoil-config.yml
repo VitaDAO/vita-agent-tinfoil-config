@@ -8,7 +8,7 @@ memory: 65536
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:45b3d7891e7bc403136e080eff5f48bfb6fdae56@sha256:74e6231c8b1187fbe582bf049cea80ad2dd1585696638dd827a318dfee93fb9d"
+    image: "ghcr.io/vitadao/vita-agent:f06f9053f8c65a8c9136ff1cc0a75fd452a3d7f5@sha256:bbad7fad1fb144bbc1ffc09e10f2ecc2c7901e7edba9d66a9d23393c94cdcacc"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -34,8 +34,8 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@45b3d78"
-      - VITA_AGENT_VERSION: "vita-agent@45b3d78"
+      - SENTRY_RELEASE: "vita-agent@f06f905"
+      - VITA_AGENT_VERSION: "vita-agent@f06f905"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
@@ -60,7 +60,7 @@ containers:
       - VITA_AGENT_CHAT_TOP_P: "0.95"
       - VITA_AGENT_CHAT_TOP_K: "20"
       - VITA_AGENT_CHAT_MIN_P: "0"
-      - VITA_AGENT_CHAT_MAX_TOKENS: "2500"
+      - VITA_AGENT_CHAT_MAX_TOKENS: "4500"
       - REDPILL_E2EE: "1"
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
       - REDPILL_ATTESTATION_RETRIES: "6"
