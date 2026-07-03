@@ -61,7 +61,7 @@ containers:
       - VITA_AGENT_CHAT_TOP_P: "0.95"
       - VITA_AGENT_CHAT_TOP_K: "20"
       - VITA_AGENT_CHAT_MIN_P: "0"
-      - VITA_AGENT_CHAT_MAX_TOKENS: "4500"
+      - VITA_AGENT_CHAT_MAX_TOKENS: "6000"
       - REDPILL_E2EE: "1"
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
       - REDPILL_ATTESTATION_RETRIES: "6"
