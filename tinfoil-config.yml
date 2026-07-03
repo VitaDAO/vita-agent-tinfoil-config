@@ -1,10 +1,10 @@
-# Tinfoil Container Configuration — vita-agent-prod (SLIM, app-only / model split)
-# App calls the model over attested HTTPS to vita-model-prod (provider=tinfoil,
-# pinned to VitaDAO/vita-agent-model-test-tinfoil-config). No GPU, no vLLM here.
+# Tinfoil Container Configuration — staging-vita-agent (staging debug enclave)
+# Staging debug container for testing vita-agent changes before production.
+# CI auto-updates the image field on every push to vita-agent staging branch.
 
 cvm-version: 0.7.5
-cpus: 8
-memory: 65536
+cpus: 4
+memory: 16384
 
 containers:
   - name: vita-agent
@@ -16,26 +16,23 @@ containers:
       - VITA_AGENT_PORT: "8787"
       - STORAGE_BACKEND: "supabase"
       - VITA_AGENT_ENABLE_NEED_FILL: "1"
-      - STRICT_PROD: "1"
+      - STRICT_PROD: "0"
       - AAD_REQUIRED: "0"
       - VITA_ROUTING_MODE: "direct"
       - VITA_AGENT_STREAMING: "1"
-      # P3-deploy-flags — audit-feature flags pinned in committed config (not just
-      # the ephemeral enclave Variables layer), so a fresh `container create` can
-      # never silently disable the safety/recall channels.
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
       - VITA_AGENT_INPUT_FILTER: "1"
       - VITA_AGENT_TOOLCALL_SALVAGE: "1"
       - OPENAI_AGENTS_DISABLE_TRACING: "1"
-      - VITA_AGENT_ENCLAVE_URL: "https://vita-agent-prod.vitality-now.containers.tinfoil.dev/"
+      - VITA_AGENT_ENCLAVE_URL: "https://staging-vita-agent.debug.vitality-now.containers.tinfoil.dev/"
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"
       - VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS: "0"
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
-      - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@22f1c52"
-      - VITA_AGENT_VERSION: "vita-agent@22f1c52"
+      - SENTRY_ENVIRONMENT: "staging"
+      - SENTRY_RELEASE: "vita-agent@staging"
+      - VITA_AGENT_VERSION: "vita-agent@staging"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
@@ -47,7 +44,7 @@ containers:
       - VITA_AGENT_AUTO_EXTRACT: "1"
       - VITA_AGENT_JOB_AUTORUN: "1"
       - AUBRAI_MODE: "x402"
-      - AUBRAI_DEBUG: "0"
+      - AUBRAI_DEBUG: "1"
       - AUBRAI_FAST: "0"
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
@@ -65,12 +62,8 @@ containers:
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
       - REDPILL_ATTESTATION_RETRIES: "6"
       - REDPILL_ATTESTATION_RETRY_BACKOFF_S: "0.5"
-      - REDPILL_REQUIRE_ATTESTATION: "1"
-      - REDPILL_REQUIRE_GPU_ATTESTATION: "1"
-      - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
-      - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
-      - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
-      - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
+      - REDPILL_REQUIRE_ATTESTATION: "0"
+      - REDPILL_REQUIRE_GPU_ATTESTATION: "0"
     secrets:
       - VITA_AGENT_GHCR_TOKEN
       - TINFOIL_API_KEY
