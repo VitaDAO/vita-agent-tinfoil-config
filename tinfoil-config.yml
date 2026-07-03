@@ -8,7 +8,7 @@ memory: 65536
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:864170b85137ada031113ee5b061b94cafee3a33@sha256:194bd9c8f1f34a77ee82141ab72e33d4a7b4a5d59e7c10d3b054e96932744fb3"
+    image: "ghcr.io/vitadao/vita-agent:3894033bcfd78774bc33ad521ab0623de88bd1bd@sha256:5b89f23253abda65affa2c4dd5904cef4ec242b24e987703b108c3c647f11ea4"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -36,8 +36,8 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@864170b"
-      - VITA_AGENT_VERSION: "vita-agent@864170b"
+      - SENTRY_RELEASE: "vita-agent@3894033"
+      - VITA_AGENT_VERSION: "vita-agent@3894033"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
