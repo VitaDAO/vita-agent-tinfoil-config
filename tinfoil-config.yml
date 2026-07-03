@@ -3,8 +3,8 @@
 # pinned to VitaDAO/vita-agent-model-test-tinfoil-config). No GPU, no vLLM here.
 
 cvm-version: 0.7.5
-cpus: 8
-memory: 65536
+cpus: 4
+memory: 16384
 
 containers:
   - name: vita-agent
