@@ -8,7 +8,7 @@ memory: 16384
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:40f2bb98c2732b013fb60fe41ab4fed1e867b126@sha256:a093504f55e301eac3921cb96a9100b95ece826970cf79215517e3543e3033da"
+    image: "ghcr.io/vitadao/vita-agent:68677e3459466ee43d435f7274dc64583b5a0024@sha256:669cf5b7a7b166a1b22edeae40537ff555636dbed5b94d3883cd9df086bafef0"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -30,6 +30,7 @@ containers:
       - VITA_AGENT_GRADED_EFFORT: "1"
       - VITA_AGENT_RESPONSE_SHAPE: "1"
       - VITA_AGENT_PARALLEL_TOOLS: "1"
+      - VITA_AGENT_STATIC_PREFIX: "1"
       - OPENAI_AGENTS_DISABLE_TRACING: "1"
       - VITA_AGENT_ENCLAVE_URL: "https://vita-agent-prod.vitality-now.containers.tinfoil.dev/"
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"
@@ -37,8 +38,8 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@05acdb9"
-      - VITA_AGENT_VERSION: "vita-agent@40f2bb9"
+      - SENTRY_RELEASE: "vita-agent@68677e3"
+      - VITA_AGENT_VERSION: "vita-agent@68677e3"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
@@ -57,7 +58,15 @@ containers:
       - VITA_AGENT_TINFOIL_ENCLAVE: "vita-model-prod.vitality-now.containers.tinfoil.dev"
       - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-test-tinfoil-config"
       - VITA_AGENT_MODEL: "qwen-opus"
-      - VITA_AGENT_HISTORY_TOKEN_BUDGET: "131072"
+      # Adaptive session replay: normal chat should not prefill 131K tokens.
+      # 131K remains available only for explicit full-history/full-audit asks.
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_STRATEGY: "adaptive"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET: "22000"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_FAST: "8000"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_NORMAL: "22000"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_COMPLEX: "32768"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_DEEP: "65536"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_FULL: "131072"
       - VITA_AGENT_CHAT_THINKING: "1"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.6"
       - VITA_AGENT_CHAT_TOP_P: "0.95"
