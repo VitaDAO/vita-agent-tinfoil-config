@@ -46,7 +46,7 @@ containers:
       - VITA_AGENT_PARALLEL_TOOLS: "1"
       - VITA_AGENT_STATIC_PREFIX: "1"
       - OPENAI_AGENTS_DISABLE_TRACING: "1"
-      - VITA_AGENT_ENCLAVE_URL: "https://staging-vita-agent-v4.debug.vitality-now.containers.tinfoil.dev/"
+      - VITA_AGENT_ENCLAVE_URL: "https://staging-vita-agent-v5.debug.vitality-now.containers.tinfoil.dev/"
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"
       - VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS: "0"
       - VITA_AGENT_JSON_LOGS: "1"
