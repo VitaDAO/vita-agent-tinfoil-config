@@ -51,6 +51,9 @@ containers:
       - SENTRY_ENVIRONMENT: "production"
       - SENTRY_RELEASE: "vita-agent@237fc881"
       - VITA_AGENT_VERSION: "vita-agent@237fc881"
+      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-237fc881"
+      - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
+      - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
@@ -109,6 +112,7 @@ containers:
       - SUPABASE_INTERNAL_AUTH_PASSWORD
       - AUBRAI_HPKE_PUBLIC_KEY
       - X402_WALLET_PRIVATE_KEY
+      - VITA_PROTOCOL_TICKET_HMAC_KEY
 
 shim:
   upstream-port: 8787
