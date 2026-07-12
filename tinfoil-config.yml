@@ -15,6 +15,10 @@ containers:
     env:
       - VITA_AGENT_PORT: "8787"
       - STORAGE_BACKEND: "supabase"
+      # Public, staging-only Supabase endpoint credentials. These are the same
+      # values shipped to the browser and carry no service-role authority.
+      - SUPABASE_URL: "https://onqhfjiymokeljclyqdu.supabase.co"
+      - SUPABASE_ANON_KEY: "sb_publishable_dfOtrN4XrFiQ2j_c2qp-TA_DK6xkOc0"
       - VITA_AGENT_ENABLE_NEED_FILL: "1"
       # Staging-only Context V2 canary. This branch/tag is never used by prod.
       - VITA_TURN_ENVELOPE_V2: "1"
@@ -42,7 +46,7 @@ containers:
       - VITA_AGENT_PARALLEL_TOOLS: "1"
       - VITA_AGENT_STATIC_PREFIX: "1"
       - OPENAI_AGENTS_DISABLE_TRACING: "1"
-      - VITA_AGENT_ENCLAVE_URL: "https://staging-vita-agent-v2.debug.vitality-now.containers.tinfoil.dev/"
+      - VITA_AGENT_ENCLAVE_URL: "https://staging-vita-agent-v4.debug.vitality-now.containers.tinfoil.dev/"
       - VITA_AGENT_REQUIRE_SEALED_DEK: "1"
       - VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS: "0"
       - VITA_AGENT_JSON_LOGS: "1"
