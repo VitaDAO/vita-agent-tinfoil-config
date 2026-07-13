@@ -25,9 +25,6 @@ containers:
       - VITA_CONTEXT_OWNER_BACKEND: "1"
       - VITA_SESSION_V2: "1"
       - VITA_HEALTH_RESOLVER_V2: "1"
-      # Test data remains visibly synthetic and is accepted only because the
-      # agent also verifies SENTRY_ENVIRONMENT=staging at process boot.
-      - VITA_STAGING_SYNTHETIC_FIXTURES: "1"
       # Fail closed to the single authenticated staging test account. The
       # allowlist stores SHA-256(subject), never the Supabase user identifier.
       - VITA_CONTEXT_V2_CANARY_USER_HASHES: "7a32f6e7936da48bcc41e0a679c2b3a216c9f7bf991978fdcad2ef1dac3d5acd"
