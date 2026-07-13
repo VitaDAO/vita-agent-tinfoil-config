@@ -8,7 +8,7 @@ memory: 8192
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:51b84cba73682116007beb244fa0d3fc07760c73@sha256:a58e33d385755ee6c22ecb79714b1023f43ca4cd1c7ac353355231146a0b9ba0"
+    image: "ghcr.io/vitadao/vita-agent:9cb0498fa13fc657e2fb403f9b2f8d69609c30a0@sha256:5f4f850fb92a91194d2cf191756249a5aebe334c107323190191fb93b77c77dd"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -58,9 +58,9 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "staging"
-      - SENTRY_RELEASE: "vita-agent@51b84cb-staging-exact-recall"
-      - VITA_AGENT_VERSION: "vita-agent@51b84cb-staging-exact-recall"
-      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-51b84cb-exact-recall"
+      - SENTRY_RELEASE: "vita-agent@9cb0498-staging-sleep-analysis"
+      - VITA_AGENT_VERSION: "vita-agent@9cb0498-staging-sleep-analysis"
+      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-9cb0498-sleep-analysis"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-13-sota-context"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
