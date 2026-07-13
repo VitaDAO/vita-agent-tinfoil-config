@@ -8,7 +8,7 @@ memory: 8192
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:0dc113b00c0218e227e100a007ab96e0918f3779@sha256:08c530ddbfe9f93362bfc0b63bf4fc42ccb980c8030b5e4194fb93e950ec3693"
+    image: "ghcr.io/vitadao/vita-agent:792472b5781b6f99cf36cef66425afa398aed29c@sha256:695a86351f4e65246779ef27b2d42817842f19a1bb55378ce083d252554a43be"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -24,6 +24,9 @@ containers:
       - VITA_CONTEXT_OWNER_BACKEND: "1"
       - VITA_SESSION_V2: "1"
       - VITA_HEALTH_RESOLVER_V2: "1"
+      # Test data remains visibly synthetic and is accepted only because the
+      # agent also verifies SENTRY_ENVIRONMENT=staging at process boot.
+      - VITA_STAGING_SYNTHETIC_FIXTURES: "1"
       # Fail closed to the single authenticated staging test account. The
       # allowlist stores SHA-256(subject), never the Supabase user identifier.
       - VITA_CONTEXT_V2_CANARY_USER_HASHES: "7a32f6e7936da48bcc41e0a679c2b3a216c9f7bf991978fdcad2ef1dac3d5acd"
@@ -54,9 +57,9 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "staging"
-      - SENTRY_RELEASE: "vita-agent@0dc113b0-staging-sota-context"
-      - VITA_AGENT_VERSION: "vita-agent@0dc113b0-staging-sota-context"
-      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-0dc113b0-sota-context"
+      - SENTRY_RELEASE: "vita-agent@792472b5-staging-sota-context"
+      - VITA_AGENT_VERSION: "vita-agent@792472b5-staging-sota-context"
+      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-792472b5-sota-context"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-13-sota-context"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
