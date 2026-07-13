@@ -8,12 +8,13 @@ memory: 8192
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:792472b5781b6f99cf36cef66425afa398aed29c@sha256:695a86351f4e65246779ef27b2d42817842f19a1bb55378ce083d252554a43be"
+    image: "ghcr.io/vitadao/vita-agent:2b3978b1a4d54cefc532a2d79ec168873e550c23@sha256:153c98cd4633265e18c9ac798100730341545b997e4eb0b528ceb41378ca6bbe"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
     env:
       - VITA_AGENT_PORT: "8787"
+      - VITA_AGENT_ENV: "staging"
       - STORAGE_BACKEND: "supabase"
       # Public, staging-only Supabase endpoint credentials. These are the same
       # values shipped to the browser and carry no service-role authority.
@@ -57,9 +58,9 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "staging"
-      - SENTRY_RELEASE: "vita-agent@792472b5-staging-sota-context"
-      - VITA_AGENT_VERSION: "vita-agent@792472b5-staging-sota-context"
-      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-792472b5-sota-context"
+      - SENTRY_RELEASE: "vita-agent@2b3978b1-staging-sota-research"
+      - VITA_AGENT_VERSION: "vita-agent@2b3978b1-staging-sota-research"
+      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-2b3978b1-sota-research"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-13-sota-context"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
