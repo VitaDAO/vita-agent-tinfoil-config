@@ -116,6 +116,11 @@ containers:
       # Never mount the production x402 wallet into staging.
       - VITA_PROTOCOL_TICKET_HMAC_KEY
       - STAGING_SUPABASE_ANON_KEY
+      # Dedicated staging machine identity. It carries only the
+      # vita_agent_internal app_metadata claim required by internal audit RLS;
+      # no service-role key is mounted in the enclave.
+      - STAGING_SUPABASE_INTERNAL_AUTH_EMAIL
+      - STAGING_SUPABASE_INTERNAL_AUTH_PASSWORD
 
 shim:
   upstream-port: 8787
