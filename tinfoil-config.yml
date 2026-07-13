@@ -8,7 +8,7 @@ memory: 8192
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:56ddc90e66a30bd0f76d00a9112c612b89d19309@sha256:4ab624b2bb9a9c7a4772d141b8307e21d785cc789840fe423677cc85196d6392"
+    image: "ghcr.io/vitadao/vita-agent:aaa3f2ef6f069f947df0f3be676ebff5b776a413@sha256:ed86f373b7d41a052db58b1e48c83eb80484cf567f7d4e8200184a03e4b3def2"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -51,9 +51,9 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "staging"
-      - SENTRY_RELEASE: "vita-agent@56ddc908-staging-context-v2"
-      - VITA_AGENT_VERSION: "vita-agent@56ddc908-staging-context-v2"
-      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-56ddc908-context-v2"
+      - SENTRY_RELEASE: "vita-agent@aaa3f2ef-staging-context-v2"
+      - VITA_AGENT_VERSION: "vita-agent@aaa3f2ef-staging-context-v2"
+      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-aaa3f2ef-context-v2"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
