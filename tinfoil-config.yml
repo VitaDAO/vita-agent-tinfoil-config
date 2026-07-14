@@ -8,7 +8,7 @@ memory: 8192
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:9cb0498fa13fc657e2fb403f9b2f8d69609c30a0@sha256:5f4f850fb92a91194d2cf191756249a5aebe334c107323190191fb93b77c77dd"
+    image: "ghcr.io/vitadao/vita-agent:v0.14.104-staging-x402-wallet@sha256:1b001bbf914472080ec527d5b44163dfbb7dd736c0a906e78184f6f14cbb6d7a"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -55,9 +55,9 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "staging"
-      - SENTRY_RELEASE: "vita-agent@9cb0498-staging-sleep-analysis"
-      - VITA_AGENT_VERSION: "vita-agent@9cb0498-staging-sleep-analysis"
-      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-9cb0498-sleep-analysis"
+      - SENTRY_RELEASE: "vita-agent@2a46097-staging-aubrai-x402-wallet"
+      - VITA_AGENT_VERSION: "vita-agent@2a46097-staging-aubrai-x402-wallet"
+      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-2a46097-aubrai-x402-wallet"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-13-sota-context"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
@@ -75,6 +75,10 @@ containers:
       - AUBRAI_MODE: "x402"
       - AUBRAI_DEBUG: "0"
       - AUBRAI_FAST: "1"
+      # Explicit, staging-only exception authorized for paid Aubrai canaries.
+      # The agent still identifies as staging and rejects this wallet unless
+      # this exact opt-in is present.
+      - VITA_AGENT_STAGING_REUSE_PRODUCTION_X402_WALLET: "1"
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
       - VITA_AGENT_TINFOIL_ENCLAVE: "vita-model-prod.vitality-now.containers.tinfoil.dev"
