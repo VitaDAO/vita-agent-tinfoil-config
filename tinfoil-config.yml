@@ -117,7 +117,10 @@ containers:
       # SUPABASE_URL and SUPABASE_ANON_KEY are public staging values supplied as
       # per-container variables. Never mount the production Supabase identity.
       - AUBRAI_HPKE_PUBLIC_KEY
-      # Never mount the production x402 wallet into staging.
+      # Explicit staging exception: reuse the production-funded x402 wallet for
+      # paid Aubrai canary calls. Tinfoil injects the value only into the
+      # attested process; the value is never committed or returned by the CLI.
+      - X402_WALLET_PRIVATE_KEY
       - VITA_PROTOCOL_TICKET_HMAC_KEY
       - STAGING_SUPABASE_ANON_KEY
       # Dedicated staging machine identity. It carries only the
