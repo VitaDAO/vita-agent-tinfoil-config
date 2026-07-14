@@ -8,7 +8,7 @@ memory: 8192
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:v0.14.106-staging-aubrai-metadata-references@sha256:500e67da96fb2d14ececdea9f750ade58eead6dfd98f8bbc8b5236ac7e869ee4"
+    image: "ghcr.io/vitadao/vita-agent:v0.14.108-staging-aubrai-high-recall@sha256:8e167c07e9f06b6c0cce4ec7d60995e55c67a6020d4b4ce3ef419db646e2c844"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -55,9 +55,9 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "staging"
-      - SENTRY_RELEASE: "vita-agent@176c71e-staging-aubrai-metadata-references"
-      - VITA_AGENT_VERSION: "vita-agent@176c71e-staging-aubrai-metadata-references"
-      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-176c71e-aubrai-metadata-references"
+      - SENTRY_RELEASE: "vita-agent@a14f739-staging-aubrai-high-recall"
+      - VITA_AGENT_VERSION: "vita-agent@a14f739-staging-aubrai-high-recall"
+      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-a14f739-aubrai-high-recall"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-13-sota-context"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
