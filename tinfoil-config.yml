@@ -29,7 +29,7 @@ containers:
       - STRICT_PROD: "1"
       - AAD_REQUIRED: "0"
       - VITA_ROUTING_MODE: "direct"
-      - VITA_AGENT_STREAMING: "1"
+      - VITA_AGENT_STREAMING: "0"
       # P3-deploy-flags — audit-feature flags pinned in committed config (not just
       # the ephemeral enclave Variables layer), so a fresh `container create` can
       # never silently disable the safety/recall channels.
