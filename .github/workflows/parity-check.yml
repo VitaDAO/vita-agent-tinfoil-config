@@ -1,0 +1,28 @@
+name: Config parity check
+
+# Fail-closed guard against staging↔prod drift on the shared turn-v2 contract.
+# Runs on every push/PR to either branch (the vita-agent build pushes image bumps
+# straight to `staging`, and humans hand-edit env/shim — both need guarding).
+on:
+  push:
+    branches: [staging, main]
+  pull_request:
+    branches: [staging, main]
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: Materialize both branch configs
+        run: |
+          git show origin/main:tinfoil-config.yml > /tmp/prod.yml
+          git show origin/staging:tinfoil-config.yml > /tmp/staging.yml
+      - name: Check turn-v2 contract parity
+        run: python3 scripts/parity_check.py /tmp/staging.yml /tmp/prod.yml
