@@ -34,6 +34,9 @@ containers:
       - VITA_CONTEXT_OWNER_BACKEND: "1"
       - VITA_SESSION_V2: "1"
       - VITA_HEALTH_RESOLVER_V2: "1"
+      # Without this the caps doc advertises turn_envelope_v2 but
+      # context_v2_enabled_for_user() gates it to 0% of users (default). Prod=100.
+      - VITA_CONTEXT_V2_CANARY_PERCENT: "100"
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
       - VITA_AGENT_INPUT_FILTER: "1"
@@ -89,6 +92,9 @@ containers:
       - SUPABASE_INTERNAL_AUTH_PASSWORD
       - AUBRAI_HPKE_PUBLIC_KEY
       - X402_WALLET_PRIVATE_KEY
+      # Backs /api/v1/turn-protocol-ticket (exposed in shim.paths). Already ATTACHED
+      # to the enclave; declared here so a create --replace can't silently drop it.
+      - VITA_PROTOCOL_TICKET_HMAC_KEY
 
 shim:
   upstream-port: 8787
