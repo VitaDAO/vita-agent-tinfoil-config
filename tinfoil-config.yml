@@ -22,6 +22,18 @@ containers:
       - AAD_REQUIRED: "0"
       - VITA_ROUTING_MODE: "direct"
       - VITA_AGENT_STREAMING: "0"
+      # Turn-V2 capability identity + context-v2 bundle (mirror prod). Without these
+      # build_capability_document() raises capability_identity_unavailable → the
+      # /.well-known/vita-agent-capabilities endpoint 503s → the V2 client cannot
+      # negotiate a turn → every chat fails with chat_agent_error. The 4 context-v2
+      # flags are all-or-nothing (partial set → partial_context_v2_bundle).
+      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-380c8d0"
+      - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
+      - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
+      - VITA_TURN_ENVELOPE_V2: "1"
+      - VITA_CONTEXT_OWNER_BACKEND: "1"
+      - VITA_SESSION_V2: "1"
+      - VITA_HEALTH_RESOLVER_V2: "1"
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
       - VITA_AGENT_INPUT_FILTER: "1"
