@@ -19,7 +19,7 @@ containers:
       - STRICT_PROD: "0"
       - AAD_REQUIRED: "0"
       - VITA_ROUTING_MODE: "direct"
-      - VITA_AGENT_STREAMING: "1"
+      - VITA_AGENT_STREAMING: "0"
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
       - VITA_AGENT_INPUT_FILTER: "1"
