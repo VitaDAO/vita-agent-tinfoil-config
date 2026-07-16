@@ -96,6 +96,8 @@ shim:
     - /api/health
     - /metrics
     - /.well-known/enclave-pubkey
+    - /.well-known/vita-agent-capabilities
+    - /api/v1/turn-protocol-ticket
     - /api/v1/capsule
     - /api/v1/capsule/stream
     - /api/v1/jobs
