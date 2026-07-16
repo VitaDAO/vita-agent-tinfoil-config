@@ -15,6 +15,8 @@ containers:
     env:
       - VITA_AGENT_PORT: "8787"
       - STORAGE_BACKEND: "supabase"
+      - SUPABASE_URL: "https://onqhfjiymokeljclyqdu.supabase.co"
+      - SUPABASE_ANON_KEY: "sb_publishable_dfOtrN4XrFiQ2j_c2qp-TA_DK6xkOc0"
       - VITA_AGENT_ENABLE_NEED_FILL: "1"
       - STRICT_PROD: "0"
       - AAD_REQUIRED: "0"
@@ -36,7 +38,7 @@ containers:
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
-      - SUPABASE_JWKS_URL: "https://cuvszjeaitakfvccvofl.supabase.co/auth/v1/.well-known/jwks.json"
+      - SUPABASE_JWKS_URL: "https://onqhfjiymokeljclyqdu.supabase.co/auth/v1/.well-known/jwks.json"
       - VITA_AGENT_RATE_LIMIT_RPM: "60"
       - VITA_AGENT_MAX_REQUEST_BYTES: "2097152"
       - VITA_AGENT_EMBED_MODEL: "BAAI/bge-base-en-v1.5"
