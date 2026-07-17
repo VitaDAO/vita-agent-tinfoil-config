@@ -18,13 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
-      - uses: tinfoilsh/pri-build-action@5d450a7f30904866efc401e24484b935b7ed52dd  # v0.6.1 (matches cvm 0.7.5; v0.9.2 computed a measurement the CVM doesn't boot to → atc mismatch)
+      - uses: tinfoilsh/measure-image-action@02f24fd03e2e79abc9a2044b1c8f380ae5bec9e3  # v0.10.0 — reads bundle_url via `gh attestation verify` (GitHub's 2026-07 API removed the inline attestation bundle, which broke v0.6.1's `Bundle.from_json(None)`). measure_amd.py is byte-identical v0.6.1→v0.10.0, so the SNP measurement math is unchanged; still GATE on measurement equality vs the deployed version before relaunch (v0.10.0 adds a vm_shape predicate field).
         with:
           config-file: ${{ github.workspace }}/tinfoil-config.yml
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          # prerelease so a new tag does NOT auto-flip /releases/latest (which would
-          # cause attestation drift vs the still-old enclave). Flip --latest only
-          # AFTER the matching enclave is deployed + atc serves the new bundle.
-          # Safe because v0.13.3 remains a non-prerelease release, so atc's
-          # /releases/latest still resolves (the repo is NOT prerelease-only).
-          prerelease: "true"
+          # v0.10.0 dropped the `prerelease` input; it now runs `gh release create
+          # --latest=false` by default (mark-as-latest defaults to "false"), which
+          # preserves the "do NOT auto-flip /releases/latest" safety so atc keeps
+          # serving the current bundle until an explicit post-deploy promotion.
