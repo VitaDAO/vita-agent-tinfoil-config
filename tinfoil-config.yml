@@ -22,6 +22,9 @@ containers:
       - VITA_SESSION_V2: "1"
       - VITA_HEALTH_RESOLVER_V2: "1"
       - VITA_CONTEXT_V2_CANARY_PERCENT: "100"
+      - VITA_TURN_V1_POLICY: "disabled"
+      - VITA_AGENT_ENABLE_LEGACY_ROUTES: "0"
+      - VITA_ACTIVE_HEALTH_FOCUS_V1: "1"
       - VITA_AUBRAI_GATEWAY_V2: "0"
       - VITA_AUBRAI_DURABLE_BUDGET: "0"
       - VITA_AUBRAI_ENCRYPTED_RESPONSE_REQUIRED: "0"
@@ -120,6 +123,7 @@ shim:
     - /metrics
     - /.well-known/enclave-pubkey
     - /.well-known/vita-agent-capabilities
+    - /.well-known/vita-agent-turn-features
     - /api/v1/turn-protocol-ticket
     - /api/v1/capsule
     - /api/v1/capsule/stream
