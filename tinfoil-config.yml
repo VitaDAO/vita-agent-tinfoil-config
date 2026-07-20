@@ -48,6 +48,11 @@ containers:
       - VITA_TURN_V1_POLICY: "disabled"
       - VITA_AGENT_ENABLE_LEGACY_ROUTES: "0"
       - VITA_ACTIVE_HEALTH_FOCUS_V1: "1"
+      # Orchestrator v3 Slice A/B verification (staging only): project raw
+      # health evidence for the model/tools and enable episode-scoped sleep
+      # honesty. See vita-agent docs/superpowers/plans/2026-07-20-vita-agent-orchestrator-v3.md.
+      - VITA_HEALTH_PROJECTION_V1: "1"
+      - VITA_SLEEP_EPISODE_V1: "1"
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
       - VITA_AGENT_INPUT_FILTER: "1"
