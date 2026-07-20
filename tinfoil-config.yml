@@ -53,6 +53,9 @@ containers:
       # honesty. See vita-agent docs/superpowers/plans/2026-07-20-vita-agent-orchestrator-v3.md.
       - VITA_HEALTH_PROJECTION_V1: "1"
       - VITA_SLEEP_EPISODE_V1: "1"
+      # Orchestrator v3 Slice C: admit grant_catalog_v1 capability + inject
+      # "# Authorized contexts" (C3). FE seal is C2; keep staging-only.
+      - VITA_GRANT_CATALOG_V1: "1"
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
       - VITA_AGENT_INPUT_FILTER: "1"
