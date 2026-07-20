@@ -86,10 +86,11 @@ containers:
       - TINFOIL_API_KEY
       - REDPILL_API_KEY
       - SENTRY_DSN
-      - SUPABASE_URL
-      - SUPABASE_ANON_KEY
-      - SUPABASE_INTERNAL_AUTH_EMAIL
-      - SUPABASE_INTERNAL_AUTH_PASSWORD
+      # Staging Supabase URL/anon live in env above (onqhf…). Do NOT attach the
+      # shared org SUPABASE_URL / SUPABASE_ANON_KEY secrets — those are prod
+      # (cuvsz…) and override the staging env values (jobs PGRST301 / JWT mismatch).
+      - STAGING_SUPABASE_INTERNAL_AUTH_EMAIL
+      - STAGING_SUPABASE_INTERNAL_AUTH_PASSWORD
       - AUBRAI_HPKE_PUBLIC_KEY
       - X402_WALLET_PRIVATE_KEY
       # Backs /api/v1/turn-protocol-ticket (exposed in shim.paths). Already ATTACHED
