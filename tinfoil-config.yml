@@ -17,10 +17,12 @@ containers:
       - STORAGE_BACKEND: "supabase"
       - SUPABASE_URL: "https://onqhfjiymokeljclyqdu.supabase.co"
       - SUPABASE_ANON_KEY: "sb_publishable_dfOtrN4XrFiQ2j_c2qp-TA_DK6xkOc0"
-      # Non-secret identity; password is supplied ONLY via encrypted container
-      # variable (empty config values override variables and break login).
+      # Non-secret identity; real password is supplied via encrypted container
+      # variable. Key MUST exist here (non-empty) or Tinfoil will not inject the
+      # variable into process env. Empty config values also override variables.
       # Do not attach shared prod SUPABASE_INTERNAL_AUTH_* org secrets.
       - SUPABASE_INTERNAL_AUTH_EMAIL: "vita-agent-staging-internal@vitadao.com"
+      - SUPABASE_INTERNAL_AUTH_PASSWORD: "override-via-container-variable"
       - VITA_AGENT_ENABLE_NEED_FILL: "1"
       - STRICT_PROD: "0"
       - AAD_REQUIRED: "0"
