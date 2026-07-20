@@ -33,7 +33,7 @@ containers:
       # /.well-known/vita-agent-capabilities endpoint 503s → the V2 client cannot
       # negotiate a turn → every chat fails with chat_agent_error. The 4 context-v2
       # flags are all-or-nothing (partial set → partial_context_v2_bundle).
-      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-ec2de2e"
+      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-cea26c1"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - VITA_TURN_ENVELOPE_V2: "1"
@@ -43,6 +43,10 @@ containers:
       # Without this the caps doc advertises turn_envelope_v2 but
       # context_v2_enabled_for_user() gates it to 0% of users (default). Prod=100.
       - VITA_CONTEXT_V2_CANARY_PERCENT: "100"
+      # Required by cea26c1+ capability document (turn_v1_policy_invalid → 503).
+      - VITA_TURN_V1_POLICY: "disabled"
+      - VITA_AGENT_ENABLE_LEGACY_ROUTES: "0"
+      - VITA_ACTIVE_HEALTH_FOCUS_V1: "1"
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
       - VITA_AGENT_INPUT_FILTER: "1"
@@ -54,8 +58,8 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "staging"
-      - SENTRY_RELEASE: "vita-agent@ec2de2e"
-      - VITA_AGENT_VERSION: "vita-agent@ec2de2e"
+      - SENTRY_RELEASE: "vita-agent@cea26c1"
+      - VITA_AGENT_VERSION: "vita-agent@cea26c1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
