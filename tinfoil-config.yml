@@ -8,7 +8,7 @@ memory: 16384
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:staging-ec2de2e78c9d090e6870d75728bf674b2b1ed873@sha256:40bdab927f5c55090ac0461639e64c8d8766e54c6444a14b33dc0ad6dc88412f"
+    image: "ghcr.io/vitadao/vita-agent:staging-cea26c13660b745d85fc61a18011b02e3a92c2c1@sha256:e77c4d4772cf6c64973ad2ab98fa654acf729c0e81cc72e0cfd1f9184db8263d"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
