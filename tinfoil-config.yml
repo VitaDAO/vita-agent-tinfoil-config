@@ -82,6 +82,14 @@ containers:
       - AUBRAI_MODE: "x402"
       - AUBRAI_DEBUG: "1"
       - AUBRAI_FAST: "0"
+      # Paid Aubrai x402 literature gateway (bundle: all-or-nothing). Must live
+      # in this env block, not as container --variable overrides — variables do
+      # not inject into the app process on this enclave, so the bundle stayed
+      # dark and external_research was never advertised. See vita-agent
+      # aubrai_upstream_capabilities.json (reviewed 2026-07-21).
+      - VITA_AUBRAI_GATEWAY_V2: "1"
+      - VITA_AUBRAI_DURABLE_BUDGET: "1"
+      - VITA_AUBRAI_ENCRYPTED_RESPONSE_REQUIRED: "1"
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
       - VITA_AGENT_TINFOIL_ENCLAVE: "vita-model-prod.vitality-now.containers.tinfoil.dev"
