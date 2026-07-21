@@ -80,16 +80,21 @@ containers:
       - VITA_AGENT_AUTO_EXTRACT: "1"
       - VITA_AGENT_JOB_AUTORUN: "1"
       - AUBRAI_MODE: "x402"
-      - AUBRAI_DEBUG: "1"
+      # AUBRAI_DEBUG must be off (0): a truthy value forces the encrypted-chat
+      # compatibility gateway dark (aubrai_encrypted_chat_compatibility_dark),
+      # which is the only literature gateway the runtime wires.
+      - AUBRAI_DEBUG: "0"
       - AUBRAI_FAST: "0"
-      # Paid Aubrai x402 literature gateway (bundle: all-or-nothing). Must live
-      # in this env block, not as container --variable overrides — variables do
-      # not inject into the app process on this enclave, so the bundle stayed
-      # dark and external_research was never advertised. See vita-agent
-      # aubrai_upstream_capabilities.json (reviewed 2026-07-21).
-      - VITA_AUBRAI_GATEWAY_V2: "1"
-      - VITA_AUBRAI_DURABLE_BUDGET: "1"
-      - VITA_AUBRAI_ENCRYPTED_RESPONSE_REQUIRED: "1"
+      # Literature (external_research) is served by the encrypted-chat
+      # compatibility gateway, which requires the paid V2 bundle flags to be
+      # OFF (a truthy flag trips aubrai_paid_literature_gateway_separate). The
+      # capability document advertises external_research on that gateway's
+      # availability (functionality on + AUBRAI_MODE=x402 + AUBRAI_DEBUG off +
+      # HPKE pin), NOT on these flags. Matches prod (all 0). The separate paid
+      # V2 gateway remains dark pending its attestation-binding review.
+      - VITA_AUBRAI_GATEWAY_V2: "0"
+      - VITA_AUBRAI_DURABLE_BUDGET: "0"
+      - VITA_AUBRAI_ENCRYPTED_RESPONSE_REQUIRED: "0"
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
       - VITA_AGENT_TINFOIL_ENCLAVE: "vita-model-prod.vitality-now.containers.tinfoil.dev"
