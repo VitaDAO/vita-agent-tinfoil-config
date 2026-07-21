@@ -8,7 +8,7 @@ memory: 16384
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:staging-f22fd6a943054fce888b2e08f45b7d1d58c694ce@sha256:dd73dbe81263f8667e9611ce9eed5e6b257845761ed8041716b0633b84685d10"
+    image: "ghcr.io/vitadao/vita-agent:staging-1d4e9adff6abbc3a765b617b21e769dcae2f59b9@sha256:15341fc484c9388b0ff3400febe6cc86c392b188f608769d65f96e12de4ed566"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -34,7 +34,7 @@ containers:
       # /.well-known/vita-agent-capabilities endpoint 503s → the V2 client cannot
       # negotiate a turn → every chat fails with chat_agent_error. The 4 context-v2
       # flags are all-or-nothing (partial set → partial_context_v2_bundle).
-      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-f22fd6a"
+      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-1d4e9ad"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - VITA_TURN_ENVELOPE_V2: "1"
@@ -67,8 +67,8 @@ containers:
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
       - SENTRY_ENVIRONMENT: "staging"
-      - SENTRY_RELEASE: "vita-agent@f22fd6a"
-      - VITA_AGENT_VERSION: "vita-agent@f22fd6a"
+      - SENTRY_RELEASE: "vita-agent@1d4e9ad"
+      - VITA_AGENT_VERSION: "vita-agent@1d4e9ad"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
