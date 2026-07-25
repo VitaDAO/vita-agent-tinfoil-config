@@ -84,7 +84,7 @@ containers:
       # compatibility gateway dark (aubrai_encrypted_chat_compatibility_dark),
       # which is the only literature gateway the runtime wires.
       - AUBRAI_DEBUG: "0"
-      - AUBRAI_FAST: "0"
+      - AUBRAI_FAST: "1"
       # Literature (external_research) is served by the encrypted-chat
       # compatibility gateway, which requires the paid V2 bundle flags to be
       # OFF (a truthy flag trips aubrai_paid_literature_gateway_separate). The
@@ -100,13 +100,31 @@ containers:
       - VITA_AGENT_TINFOIL_ENCLAVE: "vita-model-prod.vitality-now.containers.tinfoil.dev"
       - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-test-tinfoil-config"
       - VITA_AGENT_MODEL: "qwen-opus"
-      - VITA_AGENT_HISTORY_TOKEN_BUDGET: "131072"
-      - VITA_AGENT_CHAT_THINKING: "1"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET: "22000"
+      - VITA_AGENT_CHAT_THINKING: "auto"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.6"
       - VITA_AGENT_CHAT_TOP_P: "0.95"
       - VITA_AGENT_CHAT_TOP_K: "20"
       - VITA_AGENT_CHAT_MIN_P: "0"
-      - VITA_AGENT_CHAT_MAX_TOKENS: "4500"
+      - VITA_AGENT_CHAT_MAX_TOKENS: "6000"
+      # Aligned to prod 2026-07-25 so staging is a faithful stand-in. The
+      # release gate (py/bench/release_gate.py --stage config) found staging
+      # and prod disagreeing on exactly the surfaces chat work touches, which
+      # is why "verified on staging" did not imply "correct in prod".
+      # NOTE: the LOW/LIGHT/THINK_BUDGET overrides prod carried were STALE
+      # (below the code defaults that replaced them) and were removed from
+      # prod rather than copied here.
+      - VITA_AGENT_GRADED_EFFORT: "1"
+      - VITA_AGENT_RESPONSE_SHAPE: "1"
+      - VITA_AGENT_MAX_TOOL_CALLS: "10"
+      - VITA_AGENT_PARALLEL_TOOLS: "1"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_STRATEGY: "adaptive"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_NORMAL: "22000"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_FAST: "8000"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_COMPLEX: "32768"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_DEEP: "65536"
+      - VITA_AGENT_HISTORY_TOKEN_BUDGET_FULL: "131072"
+      - VITA_AUBRAI_ATTESTATION_REQUIRED: "0"
       - REDPILL_E2EE: "1"
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
       - REDPILL_ATTESTATION_RETRIES: "6"
