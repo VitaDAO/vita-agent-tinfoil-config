@@ -89,9 +89,15 @@ containers:
       - VITA_AGENT_CHAT_TOP_K: "20"
       - VITA_AGENT_CHAT_MIN_P: "0"
       - VITA_AGENT_CHAT_MAX_TOKENS: "6000"
-      - VITA_AGENT_CHAT_MAX_TOKENS_LIGHT: "800"
-      - VITA_AGENT_CHAT_MAX_TOKENS_LOW: "1200"
-      - VITA_AGENT_CHAT_THINK_BUDGET_LOW: "300"
+      # REMOVED 2026-07-25: these pinned the PRE-FIX values and silently
+      # disabled a code fix. intents/__init__.py raised the LOW cap to 4000
+      # (from 1200) on 2026-07-23 precisely because "LOW is thinking-ON, so a
+      # 1200 cap starved the visible answer" — and LOW is the everyday tier
+      # (health_analysis, science, general, profile). The env override meant
+      # prod kept running the starving value, so the fix never took effect
+      # here. Same for LIGHT (code 1300, pinned 800) and THINK_BUDGET_LOW
+      # (code 600, pinned 300). Deleting them lets the code defaults apply;
+      # they remain env-tunable if a real prod-specific reason appears.
       - VITA_AGENT_MAX_TOOL_CALLS: "10"
       - REDPILL_E2EE: "1"
       - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
