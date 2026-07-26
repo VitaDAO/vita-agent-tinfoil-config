@@ -50,6 +50,28 @@ containers:
       - VITA_AGENT_ACCEPT_LEGACY_DEK_HEADERS: "0"
       - VITA_AGENT_JSON_LOGS: "1"
       - VITA_AGENT_PROVIDER_HEALTH_DIAGNOSTICS: "1"
+      # Projects the raw HealthSnapshot into the model/tool-safe view (display
+      # names, humanized availability, no snake_case metric ids or reason
+      # codes) and enables the registry-aware prose-leak guard.
+      #
+      # Held back until BOTH of its blockers were fixed, because turning it on
+      # before them would have made prod worse, not better:
+      #  * the projection withheld `sample_values`, which resolve_binding
+      #    verifies MIN/MAX/RANGE/MEAN from — the model could not see the points
+      #    it was required to declare over (fixed, a5a53c3);
+      #  * the projection emitted `availability: "not_recorded"`, the exact
+      #    token its own leak guard rejects, and availability tokens are not
+      #    repaired — so the guard destroyed the whole answer (fixed, 1671686).
+      #
+      # NOT in CONTEXT_V2_FLAGS, so this is not a partial-bundle risk (checked:
+      # that all-or-nothing set is TURN_ENVELOPE_V2 / CONTEXT_OWNER_BACKEND /
+      # SESSION_V2 / HEALTH_RESOLVER_V2, all already on here).
+      #
+      # Evidence, 2026-07-26: A/B of the real orchestrator + resolver + model,
+      # 33 turns per arm ON vs OFF — 0 violations, 0 canned terminals, 0
+      # prose-leak guard firings in both arms. Staging has run with it on for
+      # weeks. Rollback is symmetric: set to "0" and relaunch.
+      - VITA_HEALTH_PROJECTION_V1: "1"
       - SENTRY_ENVIRONMENT: "production"
       - SENTRY_RELEASE: "vita-agent@1671686"
       - VITA_AGENT_VERSION: "vita-agent@1671686"
