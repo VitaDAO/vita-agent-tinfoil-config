@@ -48,11 +48,19 @@ containers:
       - VITA_TURN_V1_POLICY: "disabled"
       - VITA_AGENT_ENABLE_LEGACY_ROUTES: "0"
       - VITA_ACTIVE_HEALTH_FOCUS_V1: "1"
-      # Orchestrator v3 Slice A/B verification (staging only): project raw
-      # health evidence for the model/tools and enable episode-scoped sleep
-      # honesty. See vita-agent docs/superpowers/plans/2026-07-20-vita-agent-orchestrator-v3.md.
+      # Orchestrator v3 Slice A: project raw health evidence for the model and
+      # tools. NO LONGER staging-only — enabled on prod 2026-07-26 in v0.14.141,
+      # so this is now a shipped feature awaiting flag removal (see
+      # vita-agent docs/plans/2026-07-25-open-issues.md B15).
       - VITA_HEALTH_PROJECTION_V1: "1"
-      - VITA_SLEEP_EPISODE_V1: "1"
+      # VITA_SLEEP_EPISODE_V1 REMOVED 2026-07-26. It was a DEAD env var: nothing
+      # in py/src ever read it, because the behaviour it once gated (Slice B,
+      # episode-scoped sleep honesty) shipped unconditionally —
+      # health/resolver.py `_EPISODE_FRESHNESS` / `_apply_episode_freshness`,
+      # called with no flag check. Keeping it here also kept an
+      # ALLOWED_MANIFEST_DELTA entry alive that told the release gate this was
+      # an INTENTIONAL staging/prod divergence, which suppressed a real drift
+      # signal in the one gate built to catch drift.
       # Orchestrator v3 Slice C: admit grant_catalog_v1 capability + inject
       # "# Authorized contexts" (C3). FE seal is C2; keep staging-only.
       - VITA_GRANT_CATALOG_V1: "1"
