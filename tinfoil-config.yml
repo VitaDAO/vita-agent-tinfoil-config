@@ -25,6 +25,36 @@ containers:
       - VITA_TURN_V1_POLICY: "disabled"
       - VITA_AGENT_ENABLE_LEGACY_ROUTES: "0"
       - VITA_ACTIVE_HEALTH_FOCUS_V1: "1"
+      # Orchestrator v3 Slice C. Admits the grant_catalog_v1 capability, so the
+      # client seals per-context authorization rows and the agent injects the
+      # "# Authorized contexts" block. Staging-only since 2026-07-21 (b110226).
+      #
+      # What it buys: without a catalog the model is BLIND to authorization —
+      # `withheld` appears nowhere in context_assembler.py, so a denied context
+      # is handled entirely by HEALTH_DATA_NOT_GRANTED_ANSWERS, a canned string
+      # returned BEFORE inference. That terminal is whole-turn and single-slice,
+      # so an ask spanning a granted and a denied context loses the granted half
+      # and the user is told "turn on X" instead of getting the labs they asked
+      # for. The catalog carries grant/status/withheld_reason/presence per row,
+      # which is what lets one answer say "here are your labs; wearables are off"
+      # and distinguish no_data from permission_denied.
+      #
+      # Its one hazard is the model reading `presence: present` and inventing a
+      # number from authorization metadata. Three defenses, all verified:
+      #  * the injected block itself forbids it in text;
+      #  * should_inject_grant_catalog_instructions_v1 refuses to inject at all
+      #    unless coverage is armed or the route is catalog-only general —
+      #    measured: coverage_armed=0, catalog_only_general=0 -> inject=False;
+      #  * the route-independent fabrication backstop (zero loaded facts + a
+      #    personal number -> reject) covers exactly this failure mode. It did
+      #    NOT exist when this flag was written, which is what changed the
+      #    ship/hold calculus.
+      #
+      # Rollback is symmetric: drop this line and relaunch. The capability is
+      # negotiated, so an off flag stops the whole chain — the agent stops
+      # advertising grant_catalog_v1, the client stops sealing one, and
+      # injection sees catalog=None.
+      - VITA_GRANT_CATALOG_V1: "1"
       - VITA_AUBRAI_GATEWAY_V2: "0"
       - VITA_AUBRAI_DURABLE_BUDGET: "0"
       - VITA_AUBRAI_ENCRYPTED_RESPONSE_REQUIRED: "0"
