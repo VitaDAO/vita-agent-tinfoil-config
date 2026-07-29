@@ -17,13 +17,16 @@ containers:
       - STORAGE_BACKEND: "supabase"
       - SUPABASE_URL: "https://onqhfjiymokeljclyqdu.supabase.co"
       - SUPABASE_ANON_KEY: "sb_publishable_dfOtrN4XrFiQ2j_c2qp-TA_DK6xkOc0"
-      # Staging-only machine user (private config repo). Do not attach shared
-      # prod SUPABASE_INTERNAL_AUTH_* org secrets — those point at prod Auth.
-      # Note: Tinfoil config env wins over container variables for the same key,
-      # so the password must live here (or as a staging-only secret), not only
-      # as a variable.
-      - SUPABASE_INTERNAL_AUTH_EMAIL: "vita-agent-staging-internal@vitadao.com"
-      - SUPABASE_INTERNAL_AUTH_PASSWORD: "6DptV799frGnUq1ufq7wCVUejRDoKzKqz9bGPjnY"
+      # Staging machine-user identity is attached as STAGING_SUPABASE_INTERNAL_AUTH_*
+      # secrets below — NOT inlined here. This repo is the PUBLIC attestation
+      # anchor (that is its purpose), so anything written here is world-readable.
+      # An earlier revision inlined the password on the belief that this was a
+      # "private config repo"; it never was.
+      #
+      # The shared org SUPABASE_INTERNAL_AUTH_* secrets are still wrong for
+      # staging — those point at prod Auth. config.py prefers the unprefixed pair
+      # and falls back to the STAGING_ pair, so leaving the unprefixed names
+      # unattached is what makes the staging identity take effect.
       - VITA_AGENT_ENABLE_NEED_FILL: "1"
       - STRICT_PROD: "0"
       - AAD_REQUIRED: "0"
@@ -152,9 +155,13 @@ containers:
       - TINFOIL_API_KEY
       - REDPILL_API_KEY
       - SENTRY_DSN
-      # Staging Supabase URL/anon/internal identity live in env/variables above
-      # (onqhf…). Do NOT attach shared org SUPABASE_* secrets — those are prod
-      # (cuvsz…) and override the staging values (jobs PGRST301 / JWT mismatch).
+      # Staging Supabase URL/anon live in env above (onqhf…). Do NOT attach the
+      # shared org SUPABASE_* secrets — those are prod (cuvsz…) and override the
+      # staging values (jobs PGRST301 / JWT mismatch). The staging machine-user
+      # identity comes from these STAGING_-prefixed secrets, which config.py
+      # reads as its fallback pair.
+      - STAGING_SUPABASE_INTERNAL_AUTH_EMAIL
+      - STAGING_SUPABASE_INTERNAL_AUTH_PASSWORD
       - AUBRAI_HPKE_PUBLIC_KEY
       - X402_WALLET_PRIVATE_KEY
       # Backs /api/v1/turn-protocol-ticket (exposed in shim.paths). Already ATTACHED
