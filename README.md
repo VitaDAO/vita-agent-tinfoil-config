@@ -61,10 +61,10 @@ GitHub pre-release with the sigstore attestation bundle.
 
 ## Manager model pins (branch policy)
 
-| Branch / container | `VITA_AGENT_MODEL` | Enclave / repo pins |
-|---|---|---|
-| `staging` → `staging-vita-agent` | `gemma4-31b` | **unset** — native Tinfoil Inference SDK discovery (matches local `scripts/rig_env.py`) |
-| `main` → `vita-agent-prod` | `qwen-opus` | `vita-model-prod` + `VitaDAO/vita-agent-model-test-tinfoil-config` |
+| Branch / container | `VITA_AGENT_MODEL` | Enclave / repo pins | Chat knobs |
+|---|---|---|---|
+| `staging` → `staging-vita-agent` | `gemma4-31b` | **unset** — native Tinfoil Inference SDK discovery (matches local `scripts/rig_env.py`) | `VITA_AGENT_CHAT_THINKING=0` (no qwen `top_k`/`min_p`) |
+| `main` → `vita-agent-prod` | `qwen-opus` | `vita-model-prod` + `VitaDAO/vita-agent-model-test-tinfoil-config` | qwen thinking/sampling (`auto` + top_k/min_p) |
 
 Staging is the Gemma soak; prod stays on qwen until the owner explicitly approves promote. Do not copy the staging model block onto `main` without that approval.
 
