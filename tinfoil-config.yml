@@ -114,11 +114,13 @@ containers:
       - VITA_AUBRAI_GATEWAY_V2: "0"
       - VITA_AUBRAI_DURABLE_BUDGET: "0"
       - VITA_AUBRAI_ENCRYPTED_RESPONSE_REQUIRED: "0"
+      # Manager model: match local keep-local (scripts/rig_env.py LOCAL_OVERRIDES).
+      # gemma4-31b via native Tinfoil Inference SDK discovery (inference.tinfoil.sh /
+      # ATC router) — do NOT pin vita-model-prod / qwen-opus here. Prod stays on
+      # qwen-opus until owner explicitly approves promote.
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
-      - VITA_AGENT_TINFOIL_ENCLAVE: "vita-model-prod.vitality-now.containers.tinfoil.dev"
-      - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-test-tinfoil-config"
-      - VITA_AGENT_MODEL: "qwen-opus"
+      - VITA_AGENT_MODEL: "gemma4-31b"
       - VITA_AGENT_HISTORY_TOKEN_BUDGET: "22000"
       - VITA_AGENT_CHAT_THINKING: "auto"
       - VITA_AGENT_CHAT_TEMPERATURE: "0.6"
