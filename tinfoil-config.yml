@@ -104,7 +104,7 @@ containers:
       - VITA_HEALTH_PROJECTION_V1: "1"
       - SENTRY_ENVIRONMENT: "production"
       - SENTRY_RELEASE: "vita-agent@18e5d49"
-      - VITA_AGENT_VERSION: "vita-agent@18e5d49"
+      - VITA_AGENT_VERSION: "vita-agent@34759a6"
       - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-cb9f8bd"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
