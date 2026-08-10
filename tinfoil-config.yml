@@ -132,6 +132,12 @@ containers:
       # retry to absorb it. 120 is MAX_MODEL_REQUEST_TIMEOUT_S, the ceiling the
       # code itself enforces, and the value the local rig has always used.
       - VITA_AGENT_MODEL_TIMEOUT_S: "120"
+      # One retry, not two: the validator only accepts {0,1}, and at a 120s
+      # timeout a single retry already means ~240s worst case. Two (the old
+      # SDK default) would allow ~360s, well past the point a chat user has
+      # abandoned the turn. One absorbs a single slow call without turning a
+      # failure into a multi-minute wait.
+      - VITA_AGENT_MODEL_MAX_RETRIES: "1"
       - VITA_AGENT_HISTORY_TOKEN_BUDGET: "22000"
       # Hosted gemma4-31b is non-reasoning. qwen-era THINKING=auto + top_k/min_p
       # makes router.inf6 / inference.tinfoil.sh return HTTP 400 on tool-bearing
