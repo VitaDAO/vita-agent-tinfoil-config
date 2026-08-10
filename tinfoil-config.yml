@@ -121,6 +121,17 @@ containers:
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
       - VITA_AGENT_MODEL: "gemma4-31b"
+      # Restores headroom the model call used to have. Before 2026-08-05 there
+      # was no explicit timeout, so the OpenAI SDK defaults applied: 600s and
+      # 2 retries. DEFAULT_MODEL_REQUEST_TIMEOUT_S=60 / retries=0 arrived in a
+      # WIP preservation commit (ac65f5d, "not verified green ... not a quality
+      # claim") with no rationale recorded, and neither environment overrode
+      # it. Measured on this workload: warm heavy turns run 25-48s and a
+      # holistic ask took 68s, so 60s sits INSIDE the normal working range and
+      # any slowness (cold model, extra tool round) becomes a dead turn with no
+      # retry to absorb it. 120 is MAX_MODEL_REQUEST_TIMEOUT_S, the ceiling the
+      # code itself enforces, and the value the local rig has always used.
+      - VITA_AGENT_MODEL_TIMEOUT_S: "120"
       - VITA_AGENT_HISTORY_TOKEN_BUDGET: "22000"
       # Hosted gemma4-31b is non-reasoning. qwen-era THINKING=auto + top_k/min_p
       # makes router.inf6 / inference.tinfoil.sh return HTTP 400 on tool-bearing
