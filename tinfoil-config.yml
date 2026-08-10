@@ -8,7 +8,7 @@ memory: 16384
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:2469edc98505d85eeb985489eac2330b4bbfd614@sha256:f07c29db62f52b7aa39b210e2f5c91c76b6276aadf120371e703e0071d88e4c1"
+    image: "ghcr.io/vitadao/vita-agent:d93a8f19506211c3091ac71b9b34f12f74b73887@sha256:469ef34cdf0be02334bd7eefd68fdab32684194d8739b18c948b942619548dfa"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -103,8 +103,8 @@ containers:
       # weeks. Rollback is symmetric: set to "0" and relaunch.
       - VITA_HEALTH_PROJECTION_V1: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@18e5d49"
-      - VITA_AGENT_VERSION: "vita-agent@2469edc"
+      - SENTRY_RELEASE: "vita-agent@d93a8f1"
+      - VITA_AGENT_VERSION: "vita-agent@d93a8f1"
       - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-cb9f8bd"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
@@ -129,6 +129,14 @@ containers:
       # browser matrix. Owner approved the prod model promote 2026-08-08.
       # Rollback: relaunch tag v0.14.146 restores qwen-opus + the old code.
       - VITA_AGENT_MODEL: "gemma4-31b"
+      # 60s/0-retries arrived unreviewed in WIP ac65f5d (its own message: "not
+      # verified green ... not a quality claim"), replacing the OpenAI SDK
+      # defaults of 600s + 2 retries. Measured on this workload: warm heavy
+      # turns run 25-48s and a holistic ask took 68s and died, so 60s sits
+      # INSIDE the normal working range. 120 is MAX_MODEL_REQUEST_TIMEOUT_S,
+      # the ceiling the code validates against; retries cap at 1.
+      - VITA_AGENT_MODEL_TIMEOUT_S: "120"
+      - VITA_AGENT_MODEL_MAX_RETRIES: "1"
       # Adaptive session replay: normal chat should not prefill 131K tokens.
       # 131K remains available only for explicit full-history/full-audit asks.
       - VITA_AGENT_HISTORY_TOKEN_BUDGET_STRATEGY: "adaptive"
