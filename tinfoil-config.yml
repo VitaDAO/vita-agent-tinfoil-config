@@ -67,6 +67,7 @@ containers:
       # Orchestrator v3 Slice C: admit grant_catalog_v1 capability + inject
       # "# Authorized contexts" (C3). FE seal is C2; keep staging-only.
       - VITA_GRANT_CATALOG_V1: "1"
+      - VITA_FULL_HEALTH_SESSION_V1: "1"
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
       - VITA_AGENT_INPUT_FILTER: "1"
