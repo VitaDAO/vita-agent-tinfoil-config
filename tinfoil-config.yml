@@ -8,7 +8,7 @@ memory: 16384
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:d93a8f19506211c3091ac71b9b34f12f74b73887@sha256:469ef34cdf0be02334bd7eefd68fdab32684194d8739b18c948b942619548dfa"
+    image: "ghcr.io/vitadao/vita-agent:80c4c5868ae021c00f5ab0acbecb400886086ecb@sha256:43ad212401a1f367c9444acb85e108537ea61a2645f32b0004fcb696f02eabbe"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -123,12 +123,24 @@ containers:
       - AUBRAI_FAST: "1"
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
-      # Manager model: gemma4-31b via native Tinfoil Inference SDK discovery
-      # (inference.tinfoil.sh / ATC router) — same block staging has run since
-      # 2026-08-06 and the exact model+code pair behind the 11/11 staging
-      # browser matrix. Owner approved the prod model promote 2026-08-08.
-      # Rollback: relaunch tag v0.14.146 restores qwen-opus + the old code.
-      - VITA_AGENT_MODEL: "gemma4-31b"
+      # Manager model: fable-distill in our OWN attested enclave, with hosted
+      # gemma4-31b as the health-gated fallback (MODEL_FALLBACK=tinfoil resolves
+      # to DEFAULT_TINFOIL_MODEL). Promoted 2026-08-20 on a staging 20/20
+      # battery against this exact model+code pair; gemma4-31b ran prod from
+      # 2026-08-08 and stays one env flip away.
+      #
+      # MODEL_HEALTH_URL is REQUIRED and must name the enclave: the fallback is
+      # probed before the primary is constructed, so without it the gate never
+      # fires. TINFOIL_REPO pins the model enclave's attestation source.
+      # Rollback: relaunch tag v0.14.150 restores hosted gemma4-31b.
+      - VITA_AGENT_MODEL: "fable-distill"
+      - VITA_AGENT_TINFOIL_ENCLAVE: "vita-agent-model.vitality-now.containers.tinfoil.dev"
+      - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-tinfoil-config"
+      - VITA_AGENT_MODEL_FALLBACK: "tinfoil"
+      - VITA_AGENT_MODEL_HEALTH_URL: "https://vita-agent-model.vitality-now.containers.tinfoil.dev/health"
+      # Greedy decoding. TOP_K/MIN_P stay UNSET: gemma HTTP 400s on them for
+      # tool-bearing turns and the adapter swaps the model, not the knobs.
+      - VITA_AGENT_CHAT_TEMPERATURE: "0"
       # 60s/0-retries arrived unreviewed in WIP ac65f5d (its own message: "not
       # verified green ... not a quality claim"), replacing the OpenAI SDK
       # defaults of 600s + 2 retries. Measured on this workload: warm heavy
@@ -137,6 +149,17 @@ containers:
       # the ceiling the code validates against; retries cap at 1.
       - VITA_AGENT_MODEL_TIMEOUT_S: "120"
       - VITA_AGENT_MODEL_MAX_RETRIES: "1"
+      # Input budget/ceiling. The code defaults these (config.MODEL_INPUT_*),
+      # but the deployed ceiling should be auditable from the manifest.
+      # 32,000 sat BELOW the turn's own fixed floor — SKC 20,154 + instructions
+      # 9,468 + tool schemas 3,593 = 33,215 — so eviction ran on every turn and
+      # could never converge. The 64,000 ceiling sat below a real 67,162-token
+      # turn, which is why context_too_large presented as intermittent (Sentry:
+      # 56 hits, last 2026-08-17 15:25, none since). The ceiling must fit the
+      # SMALLEST window any model on the turn can serve; both fable-distill and
+      # gemma4-31b serve 262,144.
+      - VITA_AGENT_MODEL_INPUT_BUDGET: "48000"
+      - VITA_AGENT_MODEL_INPUT_HARD_CEILING: "131072"
       # Adaptive session replay: normal chat should not prefill 131K tokens.
       # 131K remains available only for explicit full-history/full-audit asks.
       - VITA_AGENT_HISTORY_TOKEN_BUDGET_STRATEGY: "adaptive"
