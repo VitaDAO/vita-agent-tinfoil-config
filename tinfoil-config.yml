@@ -103,9 +103,14 @@ containers:
       # weeks. Rollback is symmetric: set to "0" and relaunch.
       - VITA_HEALTH_PROJECTION_V1: "1"
       - SENTRY_ENVIRONMENT: "production"
-      - SENTRY_RELEASE: "vita-agent@d93a8f1"
-      - VITA_AGENT_VERSION: "vita-agent@d93a8f1"
-      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-cb9f8bd"
+      # These are the ONLY source of /api/health `version` and of Sentry's
+      # release tag — server.py reads VITA_AGENT_VERSION / SENTRY_RELEASE from
+      # the env, never from the code. Leaving them stale does not just mislead
+      # an operator reading /api/health; it files every prod error under the
+      # PREVIOUS release. Bump them with the image, every promote.
+      - SENTRY_RELEASE: "vita-agent@80c4c58"
+      - VITA_AGENT_VERSION: "vita-agent@80c4c58"
+      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-80c4c58"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
