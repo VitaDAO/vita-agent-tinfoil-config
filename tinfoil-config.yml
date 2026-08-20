@@ -178,6 +178,16 @@ containers:
       # code's "hosted-gemma" path (intents/__init__.py).
       - VITA_AGENT_CHAT_THINKING: "0"
       - VITA_AGENT_CHAT_MAX_TOKENS: "6000"
+      # THINKING-OFF tier. This is the cap the turn actually runs under
+      # now that VITA_AGENT_CHAT_THINKING="0" is honoured on V2, so it is
+      # no longer the chit-chat tier it was sized for. Left at its 1300
+      # default it starved a plain "how many workouts this month?": the
+      # answer hit finish=length every round, the agent kept spending
+      # rounds, and the turn blew past MODEL_TIMEOUT_S=120 and vanished
+      # (measured on staging 2026-08-20, 139s, no terminal). Removing the
+      # reasoning preamble does not shrink the ANSWER — it still needs the
+      # full allowance. A cap is a ceiling, not a target.
+      - VITA_AGENT_CHAT_MAX_TOKENS_LIGHT: "6000"
       # Aligned to prod 2026-07-25 so staging is a faithful stand-in. The
       # release gate (py/bench/release_gate.py --stage config) found staging
       # and prod disagreeing on exactly the surfaces chat work touches, which
