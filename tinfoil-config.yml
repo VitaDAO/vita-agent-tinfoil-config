@@ -157,6 +157,20 @@ containers:
       # abandoned the turn. One absorbs a single slow call without turning a
       # failure into a multi-minute wait.
       - VITA_AGENT_MODEL_MAX_RETRIES: "1"
+      # Parity with the rig the 20-prompt battery was validated on.
+      # Temperature 0 is not just determinism: measured on this enclave,
+      # fable-distill runs 137 tok/s at temp 0 vs 120 at temp 1.0 (~14%),
+      # because lower temperature raises speculative-draft acceptance.
+      # Staging was running the model default, so it was both slower than
+      # and less comparable to the environment the battery green came from.
+      - VITA_AGENT_CHAT_TEMPERATURE: "0"
+      # Pinned rather than inherited. These are the code defaults today
+      # (config.MODEL_INPUT_*), but the deployed ceiling should be auditable
+      # from the attestation anchor instead of implied — and it must fit the
+      # SMALLEST window any model on the turn can serve. Primary and fallback
+      # both serve 262,144, so 131,072 input + a 6k completion is ~52% of it.
+      - VITA_AGENT_MODEL_INPUT_BUDGET: "48000"
+      - VITA_AGENT_MODEL_INPUT_HARD_CEILING: "131072"
       - VITA_AGENT_HISTORY_TOKEN_BUDGET: "22000"
       # Hosted gemma4-31b is non-reasoning. qwen-era THINKING=auto + top_k/min_p
       # makes router.inf6 / inference.tinfoil.sh return HTTP 400 on tool-bearing
