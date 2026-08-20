@@ -8,7 +8,7 @@ memory: 16384
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:80c4c5868ae021c00f5ab0acbecb400886086ecb@sha256:43ad212401a1f367c9444acb85e108537ea61a2645f32b0004fcb696f02eabbe"
+    image: "ghcr.io/vitadao/vita-agent:dd9dbb7cb24c582240464dfd9c82cf588947a449@sha256:13a8cf8f0cb9a668855d5c96966a74dc9331ee12e21d280c0aec2c70069111a5"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -108,9 +108,9 @@ containers:
       # the env, never from the code. Leaving them stale does not just mislead
       # an operator reading /api/health; it files every prod error under the
       # PREVIOUS release. Bump them with the image, every promote.
-      - SENTRY_RELEASE: "vita-agent@80c4c58"
-      - VITA_AGENT_VERSION: "vita-agent@80c4c58"
-      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-80c4c58"
+      - SENTRY_RELEASE: "vita-agent@dd9dbb7"
+      - VITA_AGENT_VERSION: "vita-agent@dd9dbb7"
+      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-dd9dbb7"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
@@ -177,8 +177,20 @@ containers:
       # Hosted gemma4-31b is non-reasoning: qwen-era THINKING=auto plus the
       # top_k/min_p knobs return HTTP 400 on tool-bearing turns (measured on
       # staging 2026-08-06). Sampling uses provider defaults, as on staging.
-      - VITA_AGENT_CHAT_THINKING: "0"
+      # MUST be "auto" from dd9dbb7 onward. This lever was DEAD on the V2 path
+      # (envelope hardcodes reasoning_effort="high"), so "0" sat here doing
+      # nothing and prod has always really run thinking ON — including for the
+      # battery that validated this release. dd9dbb7 makes it live, so leaving
+      # "0" would silently flip prod to thinking-off, which measured 139s and a
+      # LOST turn on staging before MAX_TOKENS_LIGHT was raised. Do not set "0"
+      # without n>=3 per arm behind it.
+      - VITA_AGENT_CHAT_THINKING: "auto"
       - VITA_AGENT_CHAT_MAX_TOKENS: "6000"
+      # The thinking-OFF tier. Its 1300 default is the auto-mode chit-chat cap
+      # and is far too small for a real turn: every round hits finish=length,
+      # rounds burn, and the turn dies on MODEL_TIMEOUT_S. Sized here so the
+      # flag above is safe to flip.
+      - VITA_AGENT_CHAT_MAX_TOKENS_LIGHT: "6000"
       # REMOVED 2026-07-25: these pinned the PRE-FIX values and silently
       # disabled a code fix. intents/__init__.py raised the LOW cap to 4000
       # (from 1200) on 2026-07-23 precisely because "LOW is thinking-ON, so a
