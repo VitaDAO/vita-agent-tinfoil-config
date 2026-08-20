@@ -115,13 +115,31 @@ containers:
       - VITA_AUBRAI_GATEWAY_V2: "0"
       - VITA_AUBRAI_DURABLE_BUDGET: "0"
       - VITA_AUBRAI_ENCRYPTED_RESPONSE_REQUIRED: "0"
-      # Manager model: match local keep-local (scripts/rig_env.py LOCAL_OVERRIDES).
-      # gemma4-31b via native Tinfoil Inference SDK discovery (inference.tinfoil.sh /
-      # ATC router) — do NOT pin vita-model-prod / qwen-opus here. Prod stays on
-      # qwen-opus until owner explicitly approves promote.
+      # Manager model: fable-distill on our own attested H200 enclave, with
+      # gemma4-31b as the health-gated fallback.
+      #
+      # The adapter (models/provider.py) probes the PRIMARY's /health before it
+      # builds a client: healthy -> the enclave, unhealthy/unreachable -> the
+      # attested HOSTED gemma. Proven locally 2026-08-19 across all three
+      # states (primary up -> fable, primary dead -> gemma, primary back ->
+      # fable) and again through a forced failover with the tool-schema fix in
+      # place. That matters operationally as well as for quality: the model
+      # enclave takes ~20 minutes to restart (dm-verity over a 28.8 GiB
+      # package), so without the fallback every model redeploy is a 20-minute
+      # chat outage.
+      #
+      # MODEL_HEALTH_URL is REQUIRED and must name the enclave: under the
+      # tinfoil provider cfg.base_url is the always-up hosted router, so a
+      # derived /health would probe the wrong server and the failover would
+      # never fire. FALLBACK_MODEL is left unset — DEFAULT_TINFOIL_MODEL is
+      # already gemma4-31b.
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
-      - VITA_AGENT_MODEL: "gemma4-31b"
+      - VITA_AGENT_MODEL: "fable-distill"
+      - VITA_AGENT_TINFOIL_ENCLAVE: "vita-agent-model.vitality-now.containers.tinfoil.dev"
+      - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-tinfoil-config"
+      - VITA_AGENT_MODEL_FALLBACK: "tinfoil"
+      - VITA_AGENT_MODEL_HEALTH_URL: "https://vita-agent-model.vitality-now.containers.tinfoil.dev/health"
       # Restores headroom the model call used to have. Before 2026-08-05 there
       # was no explicit timeout, so the OpenAI SDK defaults applied: 600s and
       # 2 retries. DEFAULT_MODEL_REQUEST_TIMEOUT_S=60 / retries=0 arrived in a
