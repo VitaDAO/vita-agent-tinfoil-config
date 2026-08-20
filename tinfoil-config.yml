@@ -185,7 +185,15 @@ containers:
       # evidence from large cohort studies". Ungrounded evidence claims
       # are a worse failure than a rare retryable one.
       - VITA_AGENT_CHAT_THINKING: "auto"
-      - VITA_AGENT_CHAT_MAX_TOKENS: "6000"
+      # 8000 (the code default since vita-agent c09526c). This value is the
+      # ONE completion ceiling covering reasoning AND answer. Measured on
+      # fable-distill at reasoning_effort=medium: simple 417 tok, complex
+      # 2.8k, synthesis 3.2k, but a long-form "cover every system" ask lands
+      # at 5,887 and has been seen to reach 6,000 — so the old 6000 had ~2%
+      # headroom and truncated the prose mid-word, dropping the trailing
+      # vita-artifact card with it. Left at 6000 this line would OVERRIDE the
+      # code default and half-apply the fix.
+      - VITA_AGENT_CHAT_MAX_TOKENS: "8000"
       # THINKING-OFF tier. This is the cap the turn actually runs under
       # now that VITA_AGENT_CHAT_THINKING="0" is honoured on V2, so it is
       # no longer the chit-chat tier it was sized for. Left at its 1300
