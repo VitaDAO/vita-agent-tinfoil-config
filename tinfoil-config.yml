@@ -176,7 +176,15 @@ containers:
       # makes router.inf6 / inference.tinfoil.sh return HTTP 400 on tool-bearing
       # health_analysis turns (capsule BadRequestError). Thinking-off matches the
       # code's "hosted-gemma" path (intents/__init__.py).
-      - VITA_AGENT_CHAT_THINKING: "0"
+      # MEASURED 2026-08-20, do not set this to "0" without re-measuring.
+      # The lever is now honoured on V2 (vita-agent dd9dbb7). Turning
+      # thinking OFF fixes the empty-terminal (manager_output_invalid) but
+      # costs more than it saves on this manager: the same
+      # data+literature prompt went 46s/4 rounds WITH 4 PubMed citations
+      # -> 92s/6 rounds with ZERO citations, still asserting "STRONG
+      # evidence from large cohort studies". Ungrounded evidence claims
+      # are a worse failure than a rare retryable one.
+      - VITA_AGENT_CHAT_THINKING: "auto"
       - VITA_AGENT_CHAT_MAX_TOKENS: "6000"
       # THINKING-OFF tier. This is the cap the turn actually runs under
       # now that VITA_AGENT_CHAT_THINKING="0" is honoured on V2, so it is
