@@ -8,7 +8,7 @@ memory: 16384
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:dd9dbb7cb24c582240464dfd9c82cf588947a449@sha256:13a8cf8f0cb9a668855d5c96966a74dc9331ee12e21d280c0aec2c70069111a5"
+    image: "ghcr.io/vitadao/vita-agent:d1dd748be9179821f03cd851d3c4a7850bdbb82c@sha256:a4947a1e8414783eb80d31b4b3d0e8007434e55b453cbc031822ec442c29d3ae"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -55,6 +55,7 @@ containers:
       # advertising grant_catalog_v1, the client stops sealing one, and
       # injection sees catalog=None.
       - VITA_GRANT_CATALOG_V1: "1"
+      - VITA_FULL_HEALTH_SESSION_V1: "1"
       - VITA_AUBRAI_GATEWAY_V2: "0"
       - VITA_AUBRAI_DURABLE_BUDGET: "0"
       - VITA_AUBRAI_ENCRYPTED_RESPONSE_REQUIRED: "0"
@@ -69,7 +70,6 @@ containers:
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
       - VITA_AGENT_INPUT_FILTER: "1"
-      - VITA_AGENT_TOOLCALL_SALVAGE: "1"
       - VITA_AGENT_GRADED_EFFORT: "1"
       - VITA_AGENT_RESPONSE_SHAPE: "1"
       - VITA_AGENT_PARALLEL_TOOLS: "1"
@@ -108,9 +108,9 @@ containers:
       # the env, never from the code. Leaving them stale does not just mislead
       # an operator reading /api/health; it files every prod error under the
       # PREVIOUS release. Bump them with the image, every promote.
-      - SENTRY_RELEASE: "vita-agent@dd9dbb7"
-      - VITA_AGENT_VERSION: "vita-agent@dd9dbb7"
-      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-dd9dbb7"
+      - SENTRY_RELEASE: "vita-agent@d1dd748"
+      - VITA_AGENT_VERSION: "vita-agent@d1dd748"
+      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-d1dd748"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
@@ -185,7 +185,7 @@ containers:
       # LOST turn on staging before MAX_TOKENS_LIGHT was raised. Do not set "0"
       # without n>=3 per arm behind it.
       - VITA_AGENT_CHAT_THINKING: "auto"
-      - VITA_AGENT_CHAT_MAX_TOKENS: "6000"
+      - VITA_AGENT_CHAT_MAX_TOKENS: "8000"
       # The thinking-OFF tier. Its 1300 default is the auto-mode chit-chat cap
       # and is far too small for a real turn: every round hits finish=length,
       # rounds burn, and the turn dies on MODEL_TIMEOUT_S. Sized here so the
@@ -201,20 +201,9 @@ containers:
       # (code 600, pinned 300). Deleting them lets the code defaults apply;
       # they remain env-tunable if a real prod-specific reason appears.
       - VITA_AGENT_MAX_TOOL_CALLS: "10"
-      - REDPILL_E2EE: "1"
-      - REDPILL_ATTESTATION_MODE: "phala-cloud-light"
-      - REDPILL_ATTESTATION_RETRIES: "6"
-      - REDPILL_ATTESTATION_RETRY_BACKOFF_S: "0.5"
-      - REDPILL_REQUIRE_ATTESTATION: "1"
-      - REDPILL_REQUIRE_GPU_ATTESTATION: "1"
-      - REDPILL_PIN_MRTD: "f06dfda6dce1cf904d4e2bab1dc370634cf95cefa2ceb2de2eee127c9382698090d7a4a13e14c536ec6c9c3c8fa87077"
-      - REDPILL_PIN_RTMR0: "fb14dc139f33d6fcf474bc8332cac001259fb31cfbcb6b34d4ceeb552a2c4466884a0cbde45ad98a05c5c060c23ad65a"
-      - REDPILL_PIN_RTMR1: "a7b523278d4f914ee8df0ec80cd1c3d498cbf1152b0c5eaf65bad9425072874a3fcf891e8b01713d3d9937e3e0d26c15"
-      - REDPILL_PIN_RTMR2: "24847f5c5a2360d030bc4f7b8577ce32e87c4d051452c937e91220cab69542daef83433947c492b9c201182fc9769bbe"
     secrets:
       - VITA_AGENT_GHCR_TOKEN
       - TINFOIL_API_KEY
-      - REDPILL_API_KEY
       - SENTRY_DSN
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
