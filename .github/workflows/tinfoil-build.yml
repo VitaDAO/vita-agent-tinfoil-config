@@ -25,3 +25,12 @@ jobs:
           # --latest=false` by default (mark-as-latest defaults to "false"), which
           # preserves the "do NOT auto-flip /releases/latest" safety — atc keeps
           # serving the current bundle until an explicit post-deploy promotion.
+
+      # The action publishes a FULL release. Until the container is relaunched on
+      # this tag and verified, keep it a prerelease so nothing (and no one) reads
+      # it as the deployed version; the post-deploy promotion flips it with
+      # `gh release edit <tag> --latest --prerelease=false` (vita-agent#161, #176).
+      - name: Mark the new release prerelease until deployed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" --prerelease
