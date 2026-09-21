@@ -67,6 +67,10 @@ containers:
       # Orchestrator v3 Slice C: admit grant_catalog_v1 capability + inject
       # "# Authorized contexts" (C3). FE seal is C2; keep staging-only.
       - VITA_GRANT_CATALOG_V1: "1"
+      # Staging-only operator canary. App flags, migration readiness and explicit
+      # user review remain required; other actions stay disabled.
+      - VITA_APP_ACTION_PROPOSALS_V1: "1"
+      - VITA_APP_ACTION_ENABLED_V1: "app.consent.open_settings,app.wearable.open_sync_settings,app.health_calendar.update_event"
       - VITA_FULL_HEALTH_SESSION_V1: "1"
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
