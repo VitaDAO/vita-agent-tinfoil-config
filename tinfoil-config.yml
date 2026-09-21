@@ -71,6 +71,13 @@ containers:
       # user review remain required; other actions stay disabled.
       - VITA_APP_ACTION_PROPOSALS_V1: "1"
       - VITA_APP_ACTION_ENABLED_V1: "app.consent.open_settings,app.wearable.open_sync_settings,app.health_calendar.update_event"
+      # Staging conversational calendar acquisition: Agent PR #193, reviewed
+      # unleased Manager SQL baseline accepted and rechecked 2026-09-21.
+      # App acquisition enablement/rebuild and user acceptance remain separate.
+      - VITA_AGENT_MANAGER_CHECKPOINTS: "1"
+      - VITA_SERVER_HEALTH_PACK_V1: "1"
+      - VITA_APP_ACTION_TARGET_ACQUISITION_V1: "1"
+      - VITA_APP_ACTION_TARGET_ACQUISITION_DB_READY: "1"
       - VITA_FULL_HEALTH_SESSION_V1: "1"
       - VITA_AGENT_PINNED_SAFETY: "1"
       - VITA_AGENT_EXACT_MATCH: "1"
