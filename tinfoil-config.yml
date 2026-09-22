@@ -67,10 +67,10 @@ containers:
       # Orchestrator v3 Slice C: admit grant_catalog_v1 capability + inject
       # "# Authorized contexts" (C3). FE seal is C2; keep staging-only.
       - VITA_GRANT_CATALOG_V1: "1"
-      # Staging-only operator canary. App flags, migration readiness and explicit
-      # user review remain required; other actions stay disabled.
+      # Reviewed staging rollout: VitaDAO/vita-agent#194. App flags, current
+      # authority and explicit user review still gate execution. No wildcard.
       - VITA_APP_ACTION_PROPOSALS_V1: "1"
-      - VITA_APP_ACTION_ENABLED_V1: "app.consent.open_settings,app.wearable.open_sync_settings,app.health_calendar.update_event,app.health_calendar.add_event"
+      - VITA_APP_ACTION_ENABLED_V1: "app.account.open_deletion,app.account_profile.update,app.account_profile.update_avatar,app.activity.log_manual,app.biomarker.add_manual,app.consent.open_settings,app.health_calendar.add_event,app.health_calendar.create_group,app.health_calendar.update_event,app.health_profile.update,app.preferences.set_date_format,app.preferences.set_time_format,app.preferences.set_units,app.security.open_trusted_devices,app.wallet.open_link,app.wallet.open_unlink,app.wearable.connect,app.wearable.disconnect,app.wearable.open_sync_settings"
       # Staging conversational calendar acquisition: Agent PR #193, reviewed
       # unleased Manager SQL baseline accepted and rechecked 2026-09-21.
       # App acquisition enablement/rebuild and user acceptance remain separate.
