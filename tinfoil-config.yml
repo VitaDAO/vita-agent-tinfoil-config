@@ -70,13 +70,15 @@ containers:
       # Reviewed staging rollout: VitaDAO/vita-agent#194. App flags, current
       # authority and explicit user review still gate execution. No wildcard.
       - VITA_APP_ACTION_PROPOSALS_V1: "1"
-      - VITA_APP_ACTION_ENABLED_V1: "app.account.open_deletion,app.account_profile.update,app.account_profile.update_avatar,app.activity.log_manual,app.biomarker.add_manual,app.consent.open_settings,app.health_calendar.add_event,app.health_calendar.create_group,app.health_calendar.update_event,app.health_profile.update,app.preferences.set_date_format,app.preferences.set_time_format,app.preferences.set_units,app.security.open_trusted_devices,app.wallet.open_link,app.wallet.open_unlink,app.wearable.connect,app.wearable.disconnect,app.wearable.open_sync_settings"
+      - VITA_APP_ACTION_ENABLED_V1: "app.account.open_deletion,app.account_profile.update,app.account_profile.update_avatar,app.activity.delete_manual,app.activity.log_manual,app.activity.update_manual,app.biomarker.add_manual,app.biomarker.delete,app.biomarker.update,app.consent.open_settings,app.consent.set,app.health_calendar.add_event,app.health_calendar.apply_plan,app.health_calendar.attach_report,app.health_calendar.complete_event,app.health_calendar.create_group,app.health_calendar.delete_event,app.health_calendar.detach_report,app.health_calendar.edit_history,app.health_calendar.generate_plan,app.health_calendar.log_result,app.health_calendar.refine_plan,app.health_calendar.remove_group,app.health_calendar.rename_group,app.health_calendar.undo_plan,app.health_calendar.update_event,app.health_profile.update,app.preferences.set_date_format,app.preferences.set_time_format,app.preferences.set_units,app.security.open_trusted_devices,app.staking.open_approve,app.staking.open_auto_renew,app.staking.open_stake,app.staking.open_withdraw,app.subscription.open_checkout,app.subscription.open_portal,app.vault.delete_report,app.vault.download_report,app.vault.export_data,app.wallet.open_link,app.wallet.open_unlink,app.wearable.connect,app.wearable.disconnect,app.wearable.open_sync_settings"
       # Staging conversational calendar acquisition: Agent PR #193, reviewed
       # unleased Manager SQL baseline accepted and rechecked 2026-09-21.
       # App acquisition enablement/rebuild and user acceptance remain separate.
       - VITA_AGENT_MANAGER_CHECKPOINTS: "1"
       - VITA_SERVER_HEALTH_PACK_V1: "1"
       - VITA_APP_ACTION_TARGET_ACQUISITION_V1: "1"
+      # Paired App #464/#465; immutable compatibility gate: Agent #201.
+      - VITA_APP_ACTION_TARGET_ACQUISITION_V2: "1"
       - VITA_APP_ACTION_TARGET_ACQUISITION_DB_READY: "1"
       - VITA_FULL_HEALTH_SESSION_V1: "1"
       - VITA_AGENT_PINNED_SAFETY: "1"
