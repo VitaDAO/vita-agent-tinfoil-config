@@ -127,30 +127,19 @@ containers:
       - VITA_AUBRAI_GATEWAY_V2: "0"
       - VITA_AUBRAI_DURABLE_BUDGET: "0"
       - VITA_AUBRAI_ENCRYPTED_RESPONSE_REQUIRED: "0"
-      # Manager model: fable-distill on our own attested H200 enclave, with
-      # gemma4-31b as the health-gated fallback.
-      #
-      # The adapter (models/provider.py) probes the PRIMARY's /health before it
-      # builds a client: healthy -> the enclave, unhealthy/unreachable -> the
-      # attested HOSTED gemma. Proven locally 2026-08-19 across all three
-      # states (primary up -> fable, primary dead -> gemma, primary back ->
-      # fable) and again through a forced failover with the tool-schema fix in
-      # place. That matters operationally as well as for quality: the model
-      # enclave takes ~20 minutes to restart (dm-verity over a 28.8 GiB
-      # package), so without the fallback every model redeploy is a 20-minute
-      # chat outage.
-      #
-      # MODEL_HEALTH_URL is REQUIRED and must name the enclave: under the
-      # tinfoil provider cfg.base_url is the always-up hosted router, so a
-      # derived /health would probe the wrong server and the failover would
-      # never fire. FALLBACK_MODEL is left unset — DEFAULT_TINFOIL_MODEL is
-      # already gemma4-31b.
+      # Task 203: Fable medium in the native harness, with attested Open-JEV
+      # first-read selection. Manager sampling matches the local candidate.
+      # The runtime rejects the retired provider-fallback setting at boot.
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
+      - VITA_AGENT_NATIVE_HARNESS: "1"
+      - VITA_AGENT_OPEN_JEV_SELECTION: "1"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
       - VITA_AGENT_MODEL: "fable-distill"
       - VITA_AGENT_TINFOIL_ENCLAVE: "vita-agent-model.vitality-now.containers.tinfoil.dev"
       - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-tinfoil-config"
-      - VITA_AGENT_MODEL_FALLBACK: "tinfoil"
+      - VITA_AGENT_MANAGER_TEMPERATURE: "1.0"
+      - VITA_AGENT_MANAGER_TOP_P: "0.95"
+      - VITA_AGENT_MANAGER_TOP_K: "20"
       - VITA_AGENT_MODEL_HEALTH_URL: "https://vita-agent-model.vitality-now.containers.tinfoil.dev/health"
       # Restores headroom the model call used to have. Before 2026-08-05 there
       # was no explicit timeout, so the OpenAI SDK defaults applied: 600s and
@@ -169,12 +158,8 @@ containers:
       # abandoned the turn. One absorbs a single slow call without turning a
       # failure into a multi-minute wait.
       - VITA_AGENT_MODEL_MAX_RETRIES: "1"
-      # Parity with the rig the 20-prompt battery was validated on.
-      # Temperature 0 is not just determinism: measured on this enclave,
-      # fable-distill runs 137 tok/s at temp 0 vs 120 at temp 1.0 (~14%),
-      # because lower temperature raises speculative-draft acceptance.
-      # Staging was running the model default, so it was both slower than
-      # and less comparable to the environment the battery green came from.
+      # Retain the other chat setting; manager requests use the explicit
+      # VITA_AGENT_MANAGER_TEMPERATURE=1.0 above.
       - VITA_AGENT_CHAT_TEMPERATURE: "0"
       # Pinned rather than inherited. These are the code defaults today
       # (config.MODEL_INPUT_*), but the deployed ceiling should be auditable
@@ -237,6 +222,7 @@ containers:
     secrets:
       - VITA_AGENT_GHCR_TOKEN
       - TINFOIL_API_KEY
+      - OPEN_JEV_API_KEY
       - REDPILL_API_KEY
       - SENTRY_DSN
       # Staging Supabase URL/anon live in env above (onqhf…). Do NOT attach the
