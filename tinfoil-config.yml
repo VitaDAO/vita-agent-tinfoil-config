@@ -172,6 +172,10 @@ containers:
       - VITA_AGENT_MODEL_INPUT_BUDGET: "48000"
       - VITA_AGENT_MODEL_INPUT_HARD_CEILING: "131072"
       - VITA_AGENT_HISTORY_TOKEN_BUDGET: "22000"
+      # Past-conversation search: advertises conversation_history_v1 so the app
+      # grants history access and the model can search and read the user's own
+      # earlier chats (VitaDAO/vita-agent#253).
+      - VITA_CONVERSATION_HISTORY_V1: "1"
       # Hosted gemma4-31b is non-reasoning. qwen-era THINKING=auto + top_k/min_p
       # makes router.inf6 / inference.tinfoil.sh return HTTP 400 on tool-bearing
       # health_analysis turns (capsule BadRequestError). Thinking-off matches the
