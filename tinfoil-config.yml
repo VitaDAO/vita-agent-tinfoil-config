@@ -111,6 +111,9 @@ containers:
       - VITA_AGENT_PERSONA_REFRESH_EVERY: "10"
       - VITA_AGENT_AUTO_EXTRACT: "1"
       - VITA_AGENT_JOB_AUTORUN: "1"
+      # V2 post-turn jobs (memory extraction, compaction) are scheduled by every
+      # chat turn; without this they are never claimed (VitaDAO/vita-agent#247).
+      - VITA_AGENT_JOB_V2: "1"
       - AUBRAI_MODE: "x402"
       # AUBRAI_DEBUG must be off (0): a truthy value forces the encrypted-chat
       # compatibility gateway dark (aubrai_encrypted_chat_compatibility_dark),
