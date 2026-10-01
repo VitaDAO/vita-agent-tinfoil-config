@@ -8,7 +8,7 @@ memory: 16384
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:staging-86ecfaf53e79b5ae7911e99d0bfb611b7c127d25@sha256:16eb392dea440a86f78a1d4dd93d9b7b4dfe08c00065be8498a12235c42f8566"
+    image: "ghcr.io/vitadao/vita-agent:staging-a10feb8112254878b8396eb8944bd5c60610168c@sha256:ee0da1382de7d40c649c7ac03921cf6c31b9d830f171feccb1d933aeab6b8aaf"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -37,7 +37,7 @@ containers:
       # /.well-known/vita-agent-capabilities endpoint 503s → the V2 client cannot
       # negotiate a turn → every chat fails with chat_agent_error. The 4 context-v2
       # flags are all-or-nothing (partial set → partial_context_v2_bundle).
-      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-86ecfaf"
+      - VITA_AGENT_DEPLOYMENT_ID: "staging-vita-agent-a10feb8"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - VITA_TURN_ENVELOPE_V2: "1"
@@ -99,8 +99,8 @@ containers:
       # 2026-07-26). contracts.py:391 still enforces closed-set provenance and
       # the registry's unit/type/range rules on every synthetic fact.
       - VITA_STAGING_SYNTHETIC_FIXTURES: "1"
-      - SENTRY_RELEASE: "vita-agent@86ecfaf"
-      - VITA_AGENT_VERSION: "vita-agent@86ecfaf"
+      - SENTRY_RELEASE: "vita-agent@a10feb8"
+      - VITA_AGENT_VERSION: "vita-agent@a10feb8"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
       - SENTRY_PROFILES_SAMPLE_RATE: "0"
       - SUPABASE_JWT_VERIFY_MODE: "jwks"
