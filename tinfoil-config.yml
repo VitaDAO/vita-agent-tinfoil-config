@@ -136,7 +136,10 @@ containers:
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_NATIVE_HARNESS: "1"
       - VITA_AGENT_OPEN_JEV_SELECTION: "1"
-      - VITA_AGENT_OPEN_JEV_RELEASE_TARGET: "{\"host\":\"open-jev-candidate.vitality-now.containers.tinfoil.dev\",\"repo\":\"VitaDAO/open-jev-candidate-tinfoil-config\",\"credential_env\":\"TINFOIL_API_KEY\",\"release_digest\":\"ec6f0e062ac9dd34c546fbbf4f6ddde7fdc1722322ef168d9183f7270069a997\",\"selector_sha256\":\"e3aa40abe0285ff0abdb8af76b946b7a7c6eb2734766bc4192cf5a280c4a3398\",\"adapter_sha256\":\"79057d0e2673aa2813a8ea64193d74182a33392b1221c7c06d4afc7afe18dc36\"}"
+      # The release digest follows the candidate repo's newest published
+      # release (verified build attestation + enclave attestation); the
+      # selector and adapter identity hashes stay pinned and fail closed.
+      - VITA_AGENT_OPEN_JEV_RELEASE_TARGET: "{\"host\":\"open-jev-candidate.vitality-now.containers.tinfoil.dev\",\"repo\":\"VitaDAO/open-jev-candidate-tinfoil-config\",\"credential_env\":\"TINFOIL_API_KEY\",\"release_digest\":\"latest\",\"selector_sha256\":\"e3aa40abe0285ff0abdb8af76b946b7a7c6eb2734766bc4192cf5a280c4a3398\",\"adapter_sha256\":\"79057d0e2673aa2813a8ea64193d74182a33392b1221c7c06d4afc7afe18dc36\"}"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
       - VITA_AGENT_MODEL: "fable-distill"
       - VITA_AGENT_TINFOIL_ENCLAVE: "vita-agent-model.vitality-now.containers.tinfoil.dev"
