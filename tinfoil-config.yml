@@ -8,7 +8,7 @@ memory: 16384
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:staging-36833999830a8e42b0a58c54fdbe027cfcab7720@sha256:d0d6a7e7788207c612edf9682699321d7333387b44749c214ae60223f1934f63"
+    image: "ghcr.io/vitadao/vita-agent:staging-856e8e736c523868b3a8c6e4f90636828095f00b@sha256:6d076ec3edecc8ff83f6f1f4de8633e5020f8b90297a0a9e9019b9f9d2890753"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -107,9 +107,9 @@ containers:
       # the env, never from the code. Leaving them stale does not just mislead
       # an operator reading /api/health; it files every prod error under the
       # PREVIOUS release. Bump them with the image, every promote.
-      - SENTRY_RELEASE: "vita-agent@3683399"
-      - VITA_AGENT_VERSION: "vita-agent@3683399"
-      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-3683399"
+      - SENTRY_RELEASE: "vita-agent@856e8e7"
+      - VITA_AGENT_VERSION: "vita-agent@856e8e7"
+      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-856e8e7"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
@@ -135,7 +135,7 @@ containers:
       - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-tinfoil-config"
       - VITA_AGENT_MODEL_HEALTH_URL: "https://vita-agent-model.vitality-now.containers.tinfoil.dev/health"
       # Auxiliary chat setting; the native manager uses its explicit
-      # temperature=1.0, top_p=0.95 and top_k=20 settings below.
+      # temperature=0.7 (A/B 2026-10-06), top_p=0.95 and top_k=20 settings below.
       - VITA_AGENT_CHAT_TEMPERATURE: "0"
       # 60s/0-retries arrived unreviewed in WIP ac65f5d (its own message: "not
       # verified green ... not a quality claim"), replacing the OpenAI SDK
@@ -154,8 +154,8 @@ containers:
       # 56 hits, last 2026-08-17 15:25, none since). The ceiling must fit the
       # SMALLEST window any model on the turn can serve; both fable-distill and
       # gemma4-31b serve 262,144.
-      - VITA_AGENT_MODEL_INPUT_BUDGET: "48000"
-      - VITA_AGENT_MODEL_INPUT_HARD_CEILING: "131072"
+      - VITA_AGENT_MODEL_INPUT_BUDGET: "100000"
+      - VITA_AGENT_MODEL_INPUT_HARD_CEILING: "254000"
       # Adaptive session replay: normal chat should not prefill 131K tokens.
       # 131K remains available only for explicit full-history/full-audit asks.
       - VITA_AGENT_HISTORY_TOKEN_BUDGET_STRATEGY: "adaptive"
@@ -195,11 +195,12 @@ containers:
       # Vita App 0.3.0: promote staging behavior after verified production DB prerequisites.
       - VITA_AGENT_JOB_V2: "1"
       - VITA_AGENT_MANAGER_CHECKPOINTS: "1"
-      - VITA_AGENT_MANAGER_TEMPERATURE: "1.0"
+      - VITA_AGENT_MANAGER_TEMPERATURE: "0.7"
       - VITA_AGENT_MANAGER_TOP_K: "20"
       - VITA_AGENT_MANAGER_TOP_P: "0.95"
       - VITA_AGENT_NATIVE_HARNESS: "1"
       - VITA_AGENT_OPEN_JEV_SELECTION: "1"
+      - VITA_AGENT_OPEN_JEV_RELEASE_TARGET: "{\"host\":\"open-jev-candidate.vitality-now.containers.tinfoil.dev\",\"repo\":\"VitaDAO/open-jev-candidate-tinfoil-config\",\"credential_env\":\"TINFOIL_API_KEY\",\"release_digest\":\"latest\",\"selector_sha256\":\"e3aa40abe0285ff0abdb8af76b946b7a7c6eb2734766bc4192cf5a280c4a3398\",\"adapter_sha256\":\"79057d0e2673aa2813a8ea64193d74182a33392b1221c7c06d4afc7afe18dc36\"}"
       - VITA_APP_ACTION_ENABLED_V1: "app.account.open_deletion,app.account_profile.update,app.account_profile.update_avatar,app.activity.delete_manual,app.activity.log_manual,app.activity.update_manual,app.biomarker.add_manual,app.biomarker.delete,app.biomarker.update,app.consent.open_settings,app.consent.set,app.health_calendar.add_event,app.health_calendar.apply_plan,app.health_calendar.attach_report,app.health_calendar.complete_event,app.health_calendar.create_group,app.health_calendar.delete_event,app.health_calendar.detach_report,app.health_calendar.edit_history,app.health_calendar.generate_plan,app.health_calendar.log_result,app.health_calendar.refine_plan,app.health_calendar.remove_group,app.health_calendar.rename_group,app.health_calendar.undo_plan,app.health_calendar.update_event,app.health_profile.update,app.lab_report.import,app.preferences.set_date_format,app.preferences.set_time_format,app.preferences.set_units,app.security.open_trusted_devices,app.staking.open_approve,app.staking.open_auto_renew,app.staking.open_stake,app.staking.open_withdraw,app.subscription.open_checkout,app.subscription.open_portal,app.vault.delete_report,app.vault.download_report,app.vault.export_data,app.wallet.open_link,app.wallet.open_unlink,app.wearable.connect,app.wearable.disconnect,app.wearable.open_sync_settings"
       - VITA_APP_ACTION_PROPOSALS_V1: "1"
       - VITA_APP_ACTION_TARGET_ACQUISITION_DB_READY: "1"
