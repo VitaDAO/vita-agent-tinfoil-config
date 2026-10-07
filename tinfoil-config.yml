@@ -136,12 +136,18 @@ containers:
       - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
       - VITA_AGENT_NATIVE_HARNESS: "1"
       - VITA_AGENT_OPEN_JEV_SELECTION: "1"
-      - VITA_AGENT_OPEN_JEV_RELEASE_TARGET: "{\"release_digest\":\"440ca2cd1f64d991b5801f827737b17f53198c2e622650cefc50963bc69773e4\",\"selector_sha256\":\"e3aa40abe0285ff0abdb8af76b946b7a7c6eb2734766bc4192cf5a280c4a3398\",\"adapter_sha256\":\"79057d0e2673aa2813a8ea64193d74182a33392b1221c7c06d4afc7afe18dc36\",\"host\":\"open-jev-candidate.vitality-now.containers.tinfoil.dev\",\"repo\":\"VitaDAO/open-jev-candidate-tinfoil-config\",\"credential_env\":\"OPEN_JEV_CANDIDATE_API_KEY\"}"
+      # The release digest follows the candidate repo's newest published
+      # release (verified build attestation + enclave attestation); the
+      # selector and adapter identity hashes stay pinned and fail closed.
+      - VITA_AGENT_OPEN_JEV_RELEASE_TARGET: "{\"host\":\"open-jev-candidate.vitality-now.containers.tinfoil.dev\",\"repo\":\"VitaDAO/open-jev-candidate-tinfoil-config\",\"credential_env\":\"TINFOIL_API_KEY\",\"release_digest\":\"latest\",\"selector_sha256\":\"e3aa40abe0285ff0abdb8af76b946b7a7c6eb2734766bc4192cf5a280c4a3398\",\"adapter_sha256\":\"79057d0e2673aa2813a8ea64193d74182a33392b1221c7c06d4afc7afe18dc36\"}"
       - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
       - VITA_AGENT_MODEL: "fable-distill"
       - VITA_AGENT_TINFOIL_ENCLAVE: "vita-agent-model.vitality-now.containers.tinfoil.dev"
       - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-tinfoil-config"
-      - VITA_AGENT_MANAGER_TEMPERATURE: "1.0"
+      # 0.7 (was the DeepSeek reference 1.0): blind A/B 2026-10-07, 3x26 answers
+      # per arm: whole-answer language drift 1/78 -> 0/78, accepted finals 74 -> 78,
+      # quality tied on every graded slice (vita-agent push-cut.md).
+      - VITA_AGENT_MANAGER_TEMPERATURE: "0.7"
       - VITA_AGENT_MANAGER_TOP_P: "0.95"
       - VITA_AGENT_MANAGER_TOP_K: "20"
       - VITA_AGENT_MODEL_HEALTH_URL: "https://vita-agent-model.vitality-now.containers.tinfoil.dev/health"
@@ -163,15 +169,16 @@ containers:
       # failure into a multi-minute wait.
       - VITA_AGENT_MODEL_MAX_RETRIES: "1"
       # Retain the other chat setting; manager requests use the explicit
-      # VITA_AGENT_MANAGER_TEMPERATURE=1.0 above.
+      # VITA_AGENT_MANAGER_TEMPERATURE=0.7 above.
       - VITA_AGENT_CHAT_TEMPERATURE: "0"
-      # Pinned rather than inherited. These are the code defaults today
-      # (config.MODEL_INPUT_*), but the deployed ceiling should be auditable
-      # from the attestation anchor instead of implied — and it must fit the
-      # SMALLEST window any model on the turn can serve. Primary and fallback
-      # both serve 262,144, so 131,072 input + a 6k completion is ~52% of it.
-      - VITA_AGENT_MODEL_INPUT_BUDGET: "48000"
-      - VITA_AGENT_MODEL_INPUT_HARD_CEILING: "131072"
+      # Pinned rather than inherited, so the deployed ceiling is auditable from
+      # the attestation anchor. Units are estimated tokens (UTF-8 JSON bytes/2),
+      # about 2.1x real tokens. The model serves 262,144 real tokens: the hard
+      # ceiling is that window minus the 8,000-token completion (~121K real).
+      # The soft budget triggers recall compaction; 48,000 summarized long
+      # sessions that fit the window comfortably (replays, 2026-10-06).
+      - VITA_AGENT_MODEL_INPUT_BUDGET: "100000"
+      - VITA_AGENT_MODEL_INPUT_HARD_CEILING: "254000"
       - VITA_AGENT_HISTORY_TOKEN_BUDGET: "22000"
       # Past-conversation search: advertises conversation_history_v1 so the app
       # grants history access and the model can search and read the user's own
