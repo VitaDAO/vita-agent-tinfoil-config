@@ -234,6 +234,10 @@ containers:
       - VITA_AGENT_HISTORY_TOKEN_BUDGET_DEEP: "65536"
       - VITA_AGENT_HISTORY_TOKEN_BUDGET_FULL: "131072"
       - VITA_AUBRAI_ATTESTATION_REQUIRED: "0"
+      # Public web search through Exa (vita-agent #297). Needs the
+      # VITA_AGENT_EXA_API_KEY secret below; images without #297 ignore it.
+      # Staging only until the ai_insights consent text covers web search.
+      - VITA_AGENT_WEB_SEARCH: "1"
     secrets:
       - OPEN_JEV_CANDIDATE_API_KEY
       - VITA_AGENT_GHCR_TOKEN
@@ -253,6 +257,9 @@ containers:
       # Backs /api/v1/turn-protocol-ticket (exposed in shim.paths). Already ATTACHED
       # to the enclave; declared here so a create --replace can't silently drop it.
       - VITA_PROTOCOL_TICKET_HMAC_KEY
+      # Agent-owned Exa key for web search. Not EXA_API_KEY: that org secret
+      # belongs to aubrai-harness-prod.
+      - VITA_AGENT_EXA_API_KEY
 
 shim:
   upstream-port: 8787
