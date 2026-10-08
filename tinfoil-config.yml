@@ -8,7 +8,7 @@ memory: 16384
 
 containers:
   - name: vita-agent
-    image: "ghcr.io/vitadao/vita-agent:staging-a052bf3381001cbcea049795a251e9e88f92b004@sha256:873c9a87b3bd610dabb911106fb00b8d042829c75538aa3f392d6a85a3a58c21"
+    image: "ghcr.io/vitadao/vita-agent:staging-3f5ce912850fe183a3408fea548f4d8e0c546a79@sha256:ad25e8e9d8ae3d2d970ce7fc9e8b06c8d9c96f8c31364a03ebb58c0048d265c5"
     registry:
       username: DobrinAlexandru
       password_secret: VITA_AGENT_GHCR_TOKEN
@@ -107,9 +107,9 @@ containers:
       # the env, never from the code. Leaving them stale does not just mislead
       # an operator reading /api/health; it files every prod error under the
       # PREVIOUS release. Bump them with the image, every promote.
-      - SENTRY_RELEASE: "vita-agent@a052bf3"
-      - VITA_AGENT_VERSION: "vita-agent@a052bf3"
-      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-a052bf3"
+      - SENTRY_RELEASE: "vita-agent@3f5ce91"
+      - VITA_AGENT_VERSION: "vita-agent@3f5ce91"
+      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-3f5ce91"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
