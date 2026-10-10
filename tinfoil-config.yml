@@ -3,8 +3,8 @@
 # CI auto-updates the image field on every push to vita-agent staging branch.
 
 cvm-version: 0.7.5
-cpus: 4
-memory: 16384
+cpus: 2
+memory: 8192
 
 containers:
   - name: vita-agent
