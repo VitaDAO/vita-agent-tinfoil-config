@@ -2,7 +2,7 @@
 # Staging debug container for testing vita-agent changes before production.
 # CI auto-updates the image field on every push to vita-agent staging branch.
 
-cvm-version: 0.14.10
+cvm-version: 0.14.7
 cpus: 2
 memory: 8192
 
