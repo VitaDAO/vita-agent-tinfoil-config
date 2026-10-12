@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
-      - uses: tinfoilsh/measure-image-action@02f24fd03e2e79abc9a2044b1c8f380ae5bec9e3  # v0.10.0 — reads bundle_url via `gh attestation verify` (GitHub's 2026-07 API dropped the inline attestation bundle, breaking v0.6.1's Bundle.from_json(None)). Verified measurement-safe for cvm 0.7.5: the base kernel/initrd/root/raw hashes are byte-identical to v0.6.1 builds (only cmdline/config differ per release, as always).
+      - uses: tinfoilsh/pri-build-action@768ada355b32b301839c983409304dc53bcc03ff  # v0.13.1 - matches cvm 0.14.10 (same pin as aubrai-harness-prod); mark-as-latest defaults to false
         with:
           config-file: ${{ github.workspace }}/tinfoil-config.yml
           github-token: ${{ secrets.GITHUB_TOKEN }}

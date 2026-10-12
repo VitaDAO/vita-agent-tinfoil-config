@@ -2,16 +2,23 @@
 # App calls the model over attested HTTPS to vita-model-prod (provider=tinfoil,
 # pinned to VitaDAO/vita-agent-model-test-tinfoil-config). No GPU, no vLLM here.
 
-cvm-version: 0.7.5
+cvm-version: 0.14.10
 cpus: 2
 memory: 8192
 
+networks:
+  public:
+    # CVM >= 0.11 isolates containers by default (egress: closed). The service calls
+    # Supabase, Tinfoil inference/attestation, Sentry and other HTTPS APIs.
+    egress: open
+
 containers:
   - name: vita-agent
+    networks: [public]
+    # cvm 0.14 defaults to a read-only rootfs; the agent writes DATA_DIR (/home/vita/.vita-agent) at import time.
+    # Keeps the 0.7.5 behaviour; a tmpfs on the data dir could harden this later.
+    read_only: false
     image: "ghcr.io/vitadao/vita-agent:staging-a34b1d157a6d0c8c53130638e7769dcf42b4a9f9@sha256:a53d2144437b18366c9d932980a0651fe60aeb9042c1522788d73a38f5e2df30"
-    registry:
-      username: DobrinAlexandru
-      password_secret: VITA_AGENT_GHCR_TOKEN
     env:
       - VITA_AGENT_PORT: "8787"
       - STORAGE_BACKEND: "supabase"
