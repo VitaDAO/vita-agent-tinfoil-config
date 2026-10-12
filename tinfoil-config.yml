@@ -2,16 +2,23 @@
 # Staging debug container for testing vita-agent changes before production.
 # CI auto-updates the image field on every push to vita-agent staging branch.
 
-cvm-version: 0.7.5
+cvm-version: 0.14.10
 cpus: 2
 memory: 8192
 
+networks:
+  public:
+    # CVM >= 0.11 isolates containers by default (egress: closed). The service calls
+    # Supabase, Tinfoil inference/attestation, Sentry and other HTTPS APIs.
+    egress: open
+
 containers:
   - name: vita-agent
+    networks: [public]
+    # cvm 0.14 defaults to a read-only rootfs; the agent writes DATA_DIR (/home/vita/.vita-agent) at import time.
+    # Keeps the 0.7.5 behaviour; a tmpfs on the data dir could harden this later.
+    read_only: false
     image: "ghcr.io/vitadao/vita-agent:staging-6f7e9243c4b0cf144c59406dc7ea5c9b6c86af98@sha256:0daa1b76f917c3abb49ee1dd41322c8a66ca9ec7f910b72381837b0883c998ed"
-    registry:
-      username: DobrinAlexandru
-      password_secret: VITA_AGENT_GHCR_TOKEN
     env:
       - VITA_AGENT_PORT: "8787"
       - STORAGE_BACKEND: "supabase"
