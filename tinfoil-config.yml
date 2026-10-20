@@ -18,9 +18,10 @@ containers:
     # cvm 0.14 defaults to a read-only rootfs; the agent writes DATA_DIR (/home/vita/.vita-agent) at import time.
     # Keeps the 0.7.5 behaviour; a tmpfs on the data dir could harden this later.
     read_only: false
-    image: "ghcr.io/vitadao/vita-agent:3bfc6aec9a5354b3d4f7537106d1fa8e8afdec9c@sha256:7e38c3d3fecda20935a9dcdbd13f6bb440588bbb73d2abb31b115ff10301578e"
+    image: "ghcr.io/vitadao/vita-agent:9b791a2207c81578e94074488b2cb35f2ac71440@sha256:bd8a145180b29f28d269d610ce07c577b9af50b104f9c6fa3a37db252e0b2d0f"
     env:
       - VITA_AGENT_PORT: "8787"
+      - VITA_AUDIO_PROVIDER: "privatemode"
       - STORAGE_BACKEND: "supabase"
       - VITA_AGENT_ENABLE_NEED_FILL: "1"
       # Context V2 uses the reviewed encrypted turn/key-epoch schema.
@@ -114,9 +115,9 @@ containers:
       # the env, never from the code. Leaving them stale does not just mislead
       # an operator reading /api/health; it files every prod error under the
       # PREVIOUS release. Bump them with the image, every promote.
-      - SENTRY_RELEASE: "vita-agent@3bfc6ae"
-      - VITA_AGENT_VERSION: "vita-agent@3bfc6ae"
-      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-3bfc6ae"
+      - SENTRY_RELEASE: "vita-agent@9b791a2"
+      - VITA_AGENT_VERSION: "vita-agent@9b791a2"
+      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-9b791a2"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
@@ -218,6 +219,7 @@ containers:
       # Minimized public-web research requires current v5 consent and the bound Exa key.
       - VITA_AGENT_WEB_SEARCH: "1"
     secrets:
+      - PRIVATEMODE_API_KEY
       - VITA_AGENT_GHCR_TOKEN
       - TINFOIL_API_KEY
       - OPEN_JEV_API_KEY
