@@ -1,6 +1,6 @@
-# Tinfoil Container Configuration — vita-agent-prod (SLIM, app-only / model split)
-# App calls the model over attested HTTPS to vita-model-prod (provider=tinfoil,
-# pinned to VitaDAO/vita-agent-model-test-tinfoil-config). No GPU, no vLLM here.
+# Tinfoil Container Configuration — vita-agent-prod
+# Privatemode GLM inference uses the pinned attested, encrypted SDK bridge.
+# The Agent runs on CPU; no dedicated Fable model container is required.
 
 cvm-version: 0.14.10
 cpus: 2
@@ -18,7 +18,7 @@ containers:
     # cvm 0.14 defaults to a read-only rootfs; the agent writes DATA_DIR (/home/vita/.vita-agent) at import time.
     # Keeps the 0.7.5 behaviour; a tmpfs on the data dir could harden this later.
     read_only: false
-    image: "ghcr.io/vitadao/vita-agent:9b791a2207c81578e94074488b2cb35f2ac71440@sha256:bd8a145180b29f28d269d610ce07c577b9af50b104f9c6fa3a37db252e0b2d0f"
+    image: "ghcr.io/vitadao/vita-agent:81917028e76be0e6547f3521942afac2f23f1c3c@sha256:891ca17cbef95ebf487a1e6e908b9ca2f99be43d7af8f91fe7bef79c0075fc91"
     env:
       - VITA_AGENT_PORT: "8787"
       - VITA_AUDIO_PROVIDER: "privatemode"
@@ -64,10 +64,6 @@ containers:
       # injection sees catalog=None.
       - VITA_GRANT_CATALOG_V1: "1"
       - VITA_FULL_HEALTH_SESSION_V1: "1"
-      - VITA_AUBRAI_GATEWAY_V2: "0"
-      - VITA_AUBRAI_DURABLE_BUDGET: "0"
-      - VITA_AUBRAI_ENCRYPTED_RESPONSE_REQUIRED: "0"
-      - VITA_AUBRAI_ATTESTATION_REQUIRED: "0"
       - STRICT_PROD: "1"
       - AAD_REQUIRED: "0"
       - VITA_ROUTING_MODE: "direct"
@@ -115,9 +111,9 @@ containers:
       # the env, never from the code. Leaving them stale does not just mislead
       # an operator reading /api/health; it files every prod error under the
       # PREVIOUS release. Bump them with the image, every promote.
-      - SENTRY_RELEASE: "vita-agent@9b791a2"
-      - VITA_AGENT_VERSION: "vita-agent@9b791a2"
-      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-9b791a2"
+      - SENTRY_RELEASE: "vita-agent@81917028"
+      - VITA_AGENT_VERSION: "vita-agent@81917028"
+      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-81917028"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
@@ -130,29 +126,14 @@ containers:
       - VITA_AGENT_PERSONA_REFRESH_EVERY: "10"
       - VITA_AGENT_AUTO_EXTRACT: "1"
       - VITA_AGENT_JOB_AUTORUN: "1"
-      - AUBRAI_MODE: "x402"
-      - AUBRAI_DEBUG: "0"
-      - AUBRAI_FAST: "1"
-      - VITA_AGENT_MODEL_PROVIDER: "tinfoil"
-      - VITA_AGENT_TINFOIL_TRANSPORT: "sdk"
-      # Staging-verified native Fable manager; provider fallback is retired
-      # and a nonempty VITA_AGENT_MODEL_FALLBACK is rejected at boot.
-      # TINFOIL_REPO pins the model enclave's attestation source.
-      - VITA_AGENT_MODEL: "fable-distill"
-      - VITA_AGENT_TINFOIL_ENCLAVE: "vita-agent-model.vitality-now.containers.tinfoil.dev"
-      - VITA_AGENT_TINFOIL_REPO: "VitaDAO/vita-agent-model-tinfoil-config"
-      - VITA_AGENT_MODEL_HEALTH_URL: "https://vita-agent-model.vitality-now.containers.tinfoil.dev/health"
-      # Auxiliary chat setting; the native manager uses its explicit
-      # temperature=0.7 (A/B 2026-10-06), top_p=0.95 and top_k=20 settings below.
+      # Same attested GLM provider/model as the qualified staging deployment.
+      - VITA_AGENT_MODEL_PROVIDER: "privatemode"
+      - VITA_AGENT_MODEL: "glm-5.3-flash"
       - VITA_AGENT_CHAT_TEMPERATURE: "0"
-      # 60s/0-retries arrived unreviewed in WIP ac65f5d (its own message: "not
-      # verified green ... not a quality claim"), replacing the OpenAI SDK
-      # defaults of 600s + 2 retries. Measured on this workload: warm heavy
-      # turns run 25-48s and a holistic ask took 68s and died, so 60s sits
-      # INSIDE the normal working range. 120 is MAX_MODEL_REQUEST_TIMEOUT_S,
-      # the ceiling the code validates against; retries cap at 1.
       - VITA_AGENT_MODEL_TIMEOUT_S: "120"
-      - VITA_AGENT_MODEL_MAX_RETRIES: "1"
+      # Privatemode forbids cross-provider fallback and SDK retries.
+      - VITA_AGENT_MODEL_MAX_RETRIES: "0"
+      - VITA_AGENT_MODEL_FALLBACK_MODEL: "off"
       # Input budget/ceiling. The code defaults these (config.MODEL_INPUT_*),
       # but the deployed ceiling should be auditable from the manifest.
       # 32,000 sat BELOW the turn's own fixed floor — SKC 20,154 + instructions
@@ -160,8 +141,7 @@ containers:
       # could never converge. The 64,000 ceiling sat below a real 67,162-token
       # turn, which is why context_too_large presented as intermittent (Sentry:
       # 56 hits, last 2026-08-17 15:25, none since). The ceiling must fit the
-      # SMALLEST window any model on the turn can serve; both fable-distill and
-      # gemma4-31b serve 262,144.
+      # qualified GLM context window, matching the staging bounds.
       - VITA_AGENT_MODEL_INPUT_BUDGET: "100000"
       - VITA_AGENT_MODEL_INPUT_HARD_CEILING: "254000"
       # Adaptive session replay: normal chat should not prefill 131K tokens.
@@ -173,16 +153,7 @@ containers:
       - VITA_AGENT_HISTORY_TOKEN_BUDGET_COMPLEX: "32768"
       - VITA_AGENT_HISTORY_TOKEN_BUDGET_DEEP: "65536"
       - VITA_AGENT_HISTORY_TOKEN_BUDGET_FULL: "131072"
-      # Hosted gemma4-31b is non-reasoning: qwen-era THINKING=auto plus the
-      # top_k/min_p knobs return HTTP 400 on tool-bearing turns (measured on
-      # staging 2026-08-06). Sampling uses provider defaults, as on staging.
-      # MUST be "auto" from dd9dbb7 onward. This lever was DEAD on the V2 path
-      # (envelope hardcodes reasoning_effort="high"), so "0" sat here doing
-      # nothing and prod has always really run thinking ON — including for the
-      # battery that validated this release. dd9dbb7 makes it live, so leaving
-      # "0" would silently flip prod to thinking-off, which measured 139s and a
-      # LOST turn on staging before MAX_TOKENS_LIGHT was raised. Do not set "0"
-      # without n>=3 per arm behind it.
+      # Preserve staging's adaptive thinking policy and response budgets.
       - VITA_AGENT_CHAT_THINKING: "auto"
       - VITA_AGENT_CHAT_MAX_TOKENS: "8000"
       # The thinking-OFF tier. Its 1300 default is the auto-mode chit-chat cap
@@ -203,12 +174,7 @@ containers:
       # Vita App 0.3.0: promote staging behavior after verified production DB prerequisites.
       - VITA_AGENT_JOB_V2: "1"
       - VITA_AGENT_MANAGER_CHECKPOINTS: "1"
-      - VITA_AGENT_MANAGER_TEMPERATURE: "0.7"
-      - VITA_AGENT_MANAGER_TOP_K: "20"
-      - VITA_AGENT_MANAGER_TOP_P: "0.95"
       - VITA_AGENT_NATIVE_HARNESS: "1"
-      - VITA_AGENT_OPEN_JEV_SELECTION: "1"
-      - VITA_AGENT_OPEN_JEV_RELEASE_TARGET: "{\"host\":\"open-jev-candidate.vitality-now.containers.tinfoil.dev\",\"repo\":\"VitaDAO/open-jev-candidate-tinfoil-config\",\"credential_env\":\"TINFOIL_API_KEY\",\"release_digest\":\"latest\",\"selector_sha256\":\"87916b404e3e344620f8879319f081ad16e823ebfc0e41dacc3212e26b0938e7\",\"adapter_sha256\":\"79057d0e2673aa2813a8ea64193d74182a33392b1221c7c06d4afc7afe18dc36\"}"
       - VITA_APP_ACTION_ENABLED_V1: "app.account.open_deletion,app.account_profile.update,app.account_profile.update_avatar,app.activity.delete_manual,app.activity.log_manual,app.activity.update_manual,app.biomarker.add_manual,app.biomarker.delete,app.biomarker.update,app.consent.open_settings,app.consent.set,app.health_calendar.add_event,app.health_calendar.apply_plan,app.health_calendar.attach_report,app.health_calendar.complete_event,app.health_calendar.create_group,app.health_calendar.delete_event,app.health_calendar.detach_report,app.health_calendar.edit_history,app.health_calendar.generate_plan,app.health_calendar.log_result,app.health_calendar.refine_plan,app.health_calendar.remove_group,app.health_calendar.rename_group,app.health_calendar.undo_plan,app.health_calendar.update_event,app.health_profile.update,app.lab_report.import,app.preferences.set_date_format,app.preferences.set_time_format,app.preferences.set_units,app.security.open_trusted_devices,app.staking.open_approve,app.staking.open_auto_renew,app.staking.open_stake,app.staking.open_withdraw,app.subscription.open_checkout,app.subscription.open_portal,app.vault.delete_report,app.vault.download_report,app.vault.export_data,app.wallet.open_link,app.wallet.open_unlink,app.wearable.connect,app.wearable.disconnect,app.wearable.open_sync_settings"
       - VITA_APP_ACTION_PROPOSALS_V1: "1"
       - VITA_APP_ACTION_TARGET_ACQUISITION_DB_READY: "1"
@@ -219,17 +185,14 @@ containers:
       # Minimized public-web research requires current v5 consent and the bound Exa key.
       - VITA_AGENT_WEB_SEARCH: "1"
     secrets:
+      - FIRECRAWL_API_KEY
       - PRIVATEMODE_API_KEY
       - VITA_AGENT_GHCR_TOKEN
-      - TINFOIL_API_KEY
-      - OPEN_JEV_API_KEY
       - SENTRY_DSN
       - SUPABASE_URL
       - SUPABASE_ANON_KEY
       - SUPABASE_INTERNAL_AUTH_EMAIL
       - SUPABASE_INTERNAL_AUTH_PASSWORD
-      - AUBRAI_HPKE_PUBLIC_KEY
-      - X402_WALLET_PRIVATE_KEY
       - VITA_PROTOCOL_TICKET_HMAC_KEY
       - VITA_AGENT_EXA_API_KEY
 
