@@ -18,7 +18,7 @@ containers:
     # cvm 0.14 defaults to a read-only rootfs; the agent writes DATA_DIR (/home/vita/.vita-agent) at import time.
     # Keeps the 0.7.5 behaviour; a tmpfs on the data dir could harden this later.
     read_only: false
-    image: "ghcr.io/vitadao/vita-agent:staging-95085d53e157f5eefe87142f0c6886425850d7eb@sha256:4e5e7d5cc1e65da9cba9542c286cd96a8cc1979944e4c3e68e0460fd87c3e2aa"
+    image: "ghcr.io/vitadao/vita-agent:staging-109dafa5f1bba5420a0274a961de6dde36dc5be5@sha256:965b2730cbd0fc39cd466fe996abff6f2d3bf89caefb055f257c8758fd41da2f"
     env:
       # Hosted MCP grants are provisioned over the attested app connection.
       - VITA_MCP_V1: "1"
@@ -114,9 +114,9 @@ containers:
       # the env, never from the code. Leaving them stale does not just mislead
       # an operator reading /api/health; it files every prod error under the
       # PREVIOUS release. Bump them with the image, every promote.
-      - SENTRY_RELEASE: "vita-agent@95085d53"
-      - VITA_AGENT_VERSION: "vita-agent@95085d53"
-      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-95085d53"
+      - SENTRY_RELEASE: "vita-agent@109dafa5"
+      - VITA_AGENT_VERSION: "vita-agent@109dafa5"
+      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-109dafa5"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
