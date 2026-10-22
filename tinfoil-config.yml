@@ -18,8 +18,11 @@ containers:
     # cvm 0.14 defaults to a read-only rootfs; the agent writes DATA_DIR (/home/vita/.vita-agent) at import time.
     # Keeps the 0.7.5 behaviour; a tmpfs on the data dir could harden this later.
     read_only: false
-    image: "ghcr.io/vitadao/vita-agent:81917028e76be0e6547f3521942afac2f23f1c3c@sha256:891ca17cbef95ebf487a1e6e908b9ca2f99be43d7af8f91fe7bef79c0075fc91"
+    image: "ghcr.io/vitadao/vita-agent:staging-109dafa5f1bba5420a0274a961de6dde36dc5be5@sha256:965b2730cbd0fc39cd466fe996abff6f2d3bf89caefb055f257c8758fd41da2f"
     env:
+      # Hosted MCP grants are provisioned over the attested app connection.
+      - VITA_MCP_V1: "1"
+      - VITA_MCP_PUBLIC_URL: "https://vita-agent-prod.vitality-now.containers.tinfoil.dev/mcp"
       - VITA_AGENT_PORT: "8787"
       - VITA_AUDIO_PROVIDER: "privatemode"
       - STORAGE_BACKEND: "supabase"
@@ -111,9 +114,9 @@ containers:
       # the env, never from the code. Leaving them stale does not just mislead
       # an operator reading /api/health; it files every prod error under the
       # PREVIOUS release. Bump them with the image, every promote.
-      - SENTRY_RELEASE: "vita-agent@81917028"
-      - VITA_AGENT_VERSION: "vita-agent@81917028"
-      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-81917028"
+      - SENTRY_RELEASE: "vita-agent@109dafa5"
+      - VITA_AGENT_VERSION: "vita-agent@109dafa5"
+      - VITA_AGENT_DEPLOYMENT_ID: "vita-agent-prod-109dafa5"
       - VITA_AGENT_POLICY_VERSION: "vita-agent-policy/2026-07-12"
       - VITA_CONTEXT_V2_COHORT_POLICY_VERSION: "context-v2-rollout/1"
       - SENTRY_TRACES_SAMPLE_RATE: "0.1"
@@ -185,6 +188,7 @@ containers:
       # Minimized public-web research requires current v5 consent and the bound Exa key.
       - VITA_AGENT_WEB_SEARCH: "1"
     secrets:
+      - PRODUCTION_VITA_MCP_GRANT_PRIVATE_KEY
       - FIRECRAWL_API_KEY
       - PRIVATEMODE_API_KEY
       - VITA_AGENT_GHCR_TOKEN
@@ -199,6 +203,8 @@ containers:
 shim:
   upstream-port: 8787
   paths:
+    - /mcp
+    - /api/v1/mcp/info
     - /api/health
     - /metrics
     - /.well-known/enclave-pubkey
